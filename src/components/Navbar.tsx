@@ -11,7 +11,7 @@ const Navbar: React.FC = () => {
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <h1>Stellar AI Agent</h1>
+        <h1>Ole</h1>
       </div>
       <div className="navbar-wallet">
         {publicKey ? (

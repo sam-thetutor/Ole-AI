@@ -427,7 +427,7 @@
   border-radius: 15px;
   background: rgba(0, 0, 0, 0.5);
   color: #00ff88;
-  font-family: 'Orbitron', monospace;
+  font-family: 'Audiowide', monospace;
   font-size: 0.9rem;
   resize: vertical;
   outline: none;
@@ -437,7 +437,7 @@
 
 .chat-input::placeholder {
   color: rgba(0, 255, 136, 0.5);
-  font-family: 'Orbitron', monospace;
+  font-family: 'Audiowide', monospace;
 }
 
 .chat-input:focus {
@@ -458,7 +458,7 @@
   min-width: 100px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  font-family: 'Orbitron', monospace;
+  font-family: 'Audiowide', monospace;
   box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
   position: relative;
   overflow: hidden;

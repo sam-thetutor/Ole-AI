@@ -1,5 +1,7 @@
 # Stellar AI Agent
 
+![Stellar AI Agent Interface](./src/assets/hero.png)
+
 ## Overview
 Stellar AI Agent is an intelligent, conversational assistant for blockchain financial management. It enables users to perform all major blockchain actions—such as sending and receiving tokens, creating payment links, checking balances, swapping assets, managing investments, and automating recurring tasks—using simple natural language prompts. The agent acts as a unified interface, automating complex workflows and providing personalized financial assistance based on user preferences and risk tolerance.
 
@@ -25,6 +27,9 @@ The Stellar AI Agent solves these challenges by providing a unified, intelligent
 - **Frictionless Experience**: By consolidating fragmented workflows and automating repetitive tasks, the Stellar AI Agent empowers users to fully leverage blockchain technology with ease and confidence.
 
 ## Features
+
+![AI Chat Interface](./src/assets/chat.png)
+
 - **AI-Powered Token Transfers**: Send tokens to any address using simple prompts.
 - **Payment Link Creation**: Generate fixed or open payment links for receiving payments or donations.
 - **Wallet Balance Checks**: Instantly view your balances for all supported tokens.
