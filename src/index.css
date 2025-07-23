@@ -1,11 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Orbitron', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color-scheme: dark;
+  color: #00ff88;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -15,22 +17,41 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: #00ff88;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: #00cc6a;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
+  font-weight: 700;
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
 }
 
 button {
@@ -42,25 +63,53 @@ button {
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s ease;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: #00ff88;
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid #00ff88;
+  outline-offset: 2px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+/* Alien tech scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00ff88, #00cc6a);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #00cc6a, #00994d);
+}
+
+/* Glowing text effect */
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
   }
-  a:hover {
-    color: #747bff;
+  50% {
+    text-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.3);
   }
-  button {
-    background-color: #f9f9f9;
+}
+
+/* Matrix rain effect */
+@keyframes matrix-rain {
+  0% {
+    transform: translateY(-100vh);
+  }
+  100% {
+    transform: translateY(100vh);
   }
 }
