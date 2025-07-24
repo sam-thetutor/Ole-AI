@@ -344,4 +344,425 @@
   .feature-card p {
     font-size: 0.9rem;
   }
+}
+
+/* Roadmap Section - Alien Tech Theme */
+.roadmap-section {
+  padding: 4rem 2rem;
+  background: 
+    linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(0, 20, 40, 0.9) 100%),
+    radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(0, 255, 136, 0.2);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+/* Roadmap Starfield Background */
+.roadmap-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(3px 3px at 20px 30px, #00ff88, transparent),
+    radial-gradient(3px 3px at 40px 70px, rgba(0, 255, 136, 0.9), transparent),
+    radial-gradient(2px 2px at 90px 40px, #00ff88, transparent),
+    radial-gradient(2px 2px at 130px 80px, rgba(0, 255, 136, 0.8), transparent),
+    radial-gradient(3px 3px at 160px 30px, #00ff88, transparent),
+    radial-gradient(2px 2px at 200px 60px, rgba(0, 255, 136, 0.9), transparent),
+    radial-gradient(3px 3px at 240px 20px, #00ff88, transparent),
+    radial-gradient(2px 2px at 280px 90px, rgba(0, 255, 136, 0.7), transparent),
+    radial-gradient(3px 3px at 320px 50px, #00ff88, transparent),
+    radial-gradient(2px 2px at 360px 10px, rgba(0, 255, 136, 0.9), transparent),
+    radial-gradient(3px 3px at 400px 80px, #00ff88, transparent),
+    radial-gradient(2px 2px at 440px 30px, rgba(0, 255, 136, 0.8), transparent),
+    radial-gradient(3px 3px at 480px 70px, #00ff88, transparent),
+    radial-gradient(2px 2px at 520px 40px, rgba(0, 255, 136, 0.9), transparent),
+    radial-gradient(3px 3px at 560px 90px, #00ff88, transparent),
+    radial-gradient(2px 2px at 600px 20px, rgba(0, 255, 136, 0.7), transparent);
+  background-repeat: repeat;
+  background-size: 640px 100px;
+  animation: roadmap-starfield 30s linear infinite;
+  opacity: 0.8;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Second layer of stars for depth */
+.roadmap-section::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(2px 2px at 50px 50px, rgba(0, 255, 136, 1), transparent),
+    radial-gradient(2px 2px at 150px 150px, rgba(0, 255, 136, 0.8), transparent),
+    radial-gradient(2px 2px at 250px 100px, rgba(0, 255, 136, 0.9), transparent),
+    radial-gradient(2px 2px at 350px 200px, rgba(0, 255, 136, 0.7), transparent),
+    radial-gradient(2px 2px at 450px 50px, rgba(0, 255, 136, 1), transparent),
+    radial-gradient(2px 2px at 550px 180px, rgba(0, 255, 136, 0.8), transparent),
+    radial-gradient(2px 2px at 650px 120px, rgba(0, 255, 136, 0.9), transparent),
+    radial-gradient(2px 2px at 750px 80px, rgba(0, 255, 136, 0.7), transparent);
+  background-repeat: repeat;
+  background-size: 800px 200px;
+  animation: roadmap-starfield-slow 45s linear infinite;
+  opacity: 0.7;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.roadmap-section .grid-pattern {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 136, 0.03) 2px,
+      rgba(0, 255, 136, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 255, 136, 0.03) 2px,
+      rgba(0, 255, 136, 0.03) 4px
+    );
+  pointer-events: none;
+  animation: grid-scan 20s linear infinite;
+  z-index: 1;
+}
+
+.roadmap-section .scan-line {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00ff88, transparent);
+  animation: scan-line 3s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+  z-index: 2;
+}
+
+.roadmap-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  position: relative;
+  z-index: 3;
+}
+
+.roadmap-phase {
+  background: 
+    linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 20, 40, 0.8) 100%),
+    radial-gradient(circle at 50% 50%, rgba(0, 255, 136, 0.05) 0%, transparent 70%);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 16px;
+  padding: 2rem;
+  backdrop-filter: blur(15px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 0 20px rgba(0, 255, 136, 0.1),
+    inset 0 0 20px rgba(0, 255, 136, 0.05);
+}
+
+.roadmap-phase::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: conic-gradient(from 0deg, transparent, rgba(0, 255, 136, 0.3), transparent, rgba(0, 255, 136, 0.1), transparent);
+  border-radius: 18px;
+  z-index: -1;
+  animation: energy-field 6s linear infinite;
+  animation-delay: calc(var(--phase-index, 0) * 1s);
+}
+
+.roadmap-phase .hover-effect {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.15), transparent);
+  transition: left 0.5s ease;
+  z-index: 1;
+}
+
+.roadmap-phase:hover .hover-effect {
+  left: 100%;
+}
+
+.roadmap-phase::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 5px,
+      rgba(0, 255, 136, 0.02) 5px,
+      rgba(0, 255, 136, 0.02) 10px
+    ),
+    radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(0, 255, 136, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: holographic-shift 8s ease-in-out infinite;
+}
+
+.roadmap-phase:hover {
+  border-color: rgba(0, 255, 136, 0.6);
+  box-shadow: 
+    0 0 40px rgba(0, 255, 136, 0.3),
+    inset 0 0 30px rgba(0, 255, 136, 0.1);
+  transform: translateY(-8px) scale(1.02);
+}
+
+.phase-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.phase-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  background: 
+    radial-gradient(circle, rgba(0, 255, 136, 0.2) 0%, rgba(0, 255, 136, 0.05) 70%);
+  border: 2px solid rgba(0, 255, 136, 0.3);
+  border-radius: 50%;
+  color: #00ff88;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 0 20px rgba(0, 255, 136, 0.2),
+    inset 0 0 20px rgba(0, 255, 136, 0.1);
+}
+
+.phase-icon::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(from 0deg, transparent, rgba(0, 255, 136, 0.3), transparent);
+  animation: rotate-glow 4s linear infinite;
+}
+
+.phase-icon svg {
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 5px rgba(0, 255, 136, 0.5));
+}
+
+.phase-header h3 {
+  color: #00ff88;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  flex-grow: 1;
+  position: relative;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.phase-header h3::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.3), transparent);
+  animation: data-transmission 4s ease-in-out infinite;
+  animation-delay: calc(var(--phase-index, 0) * 0.5s);
+}
+
+.phase-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.phase-status.completed {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+}
+
+.phase-status.in-progress {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.phase-status.planned {
+  background: rgba(108, 117, 125, 0.2);
+  color: #6c757d;
+  border: 1px solid rgba(108, 117, 125, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.phase-status.planned::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(108, 117, 125, 0.3), transparent);
+  animation: status-scan 2s ease-in-out infinite;
+}
+
+.phase-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.phase-content li {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.phase-content li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  width: 8px;
+  height: 8px;
+  background: radial-gradient(circle, #00ff88 0%, rgba(0, 255, 136, 0.3) 70%);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Alien Tech Animations */
+@keyframes grid-scan {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(20px, 20px); }
+}
+
+@keyframes scan-line {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: -100%; }
+}
+
+@keyframes rotate-glow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+    transform: scale(1.2);
+  }
+}
+
+@keyframes status-scan {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@keyframes holographic-shift {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.02); }
+}
+
+@keyframes data-transmission {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+@keyframes energy-field {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Roadmap Starfield Animations */
+@keyframes roadmap-starfield {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-100px); }
+}
+
+@keyframes roadmap-starfield-slow {
+  0% { transform: translateY(0px); }
+  100% { transform: translateY(-200px); }
+}
+
+/* Mobile Responsive for Roadmap */
+@media (max-width: 768px) {
+  .roadmap-section {
+    padding: 2rem 1rem;
+  }
+  
+  .roadmap-container {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .roadmap-phase {
+    padding: 1.5rem;
+  }
+  
+  .phase-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .phase-header h3 {
+    font-size: 1.1rem;
+  }
+  
+  .phase-content li {
+    font-size: 0.9rem;
+  }
 } 

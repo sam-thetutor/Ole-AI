@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { StellarWalletProvider } from './contexts/StellarWalletContext/StellarWalletContext'
 import Navbar from './components/layout/Navbar/Navbar'
+import Footer from './components/layout/Footer/Footer'
 import Homepage from './pages/homepage/Homepage/Homepage'
 import Dashboard from './pages/dashboard/Dashboard/Dashboard'
 import ChatInterface from './pages/chat/ChatInterface/ChatInterface'
@@ -35,6 +36,7 @@ function App() {
               />
             </Routes>
           </main>
+          <Footer />
         </div>
       </Router>
     </StellarWalletProvider>
