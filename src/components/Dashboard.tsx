@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStellarWallet } from '../contexts/StellarWalletContext';
-import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2, Menu, X, Wallet, History } from 'lucide-react';
+import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2, Menu, X, Wallet, History, Trophy, Calendar, Clock } from 'lucide-react';
 
 interface Transaction {
   id: string;
@@ -12,7 +12,18 @@ interface Transaction {
   timestamp: string;
 }
 
-type DashboardSection = 'wallet' | 'transactions';
+interface LeaderboardEntry {
+  id: string;
+  rank: number;
+  username: string;
+  address: string;
+  score: number;
+  transactions: number;
+  volume: string;
+  change: number; // percentage change
+}
+
+type DashboardSection = 'wallet' | 'transactions' | 'leaderboard';
 
 const Dashboard: React.FC = () => {
   const { publicKey } = useStellarWallet();
@@ -20,6 +31,24 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<DashboardSection>('wallet');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [leaderboardType, setLeaderboardType] = useState<'weekly' | 'monthly'>('weekly');
+
+  // Mock leaderboard data
+  const weeklyLeaderboard: LeaderboardEntry[] = [
+    { id: '1', rank: 1, username: 'CryptoKing', address: 'GCUE26...F4JN', score: 9850, transactions: 127, volume: '125,430 XLM', change: 12.5 },
+    { id: '2', rank: 2, username: 'StellarPro', address: 'GB7XY...K9LM', score: 8740, transactions: 98, volume: '98,750 XLM', change: 8.3 },
+    { id: '3', rank: 3, username: 'BlockchainQueen', address: 'GD3KJ...P2QR', score: 7620, transactions: 85, volume: '87,320 XLM', change: -2.1 },
+    { id: '4', rank: 4, username: 'XLMWhale', address: 'GA5X4...M8ST', score: 6540, transactions: 72, volume: '76,890 XLM', change: 15.7 },
+    { id: '5', rank: 5, username: 'DeFiMaster', address: 'GC9KL...N4UV', score: 5890, transactions: 63, volume: '65,420 XLM', change: 5.2 },
+  ];
+
+  const monthlyLeaderboard: LeaderboardEntry[] = [
+    { id: '1', rank: 1, username: 'CryptoKing', address: 'GCUE26...F4JN', score: 45230, transactions: 589, volume: '567,890 XLM', change: 18.7 },
+    { id: '2', rank: 2, username: 'StellarPro', address: 'GB7XY...K9LM', score: 39870, transactions: 445, volume: '498,750 XLM', change: 12.3 },
+    { id: '3', rank: 3, username: 'BlockchainQueen', address: 'GD3KJ...P2QR', score: 34560, transactions: 398, volume: '432,100 XLM', change: -1.5 },
+    { id: '4', rank: 4, username: 'XLMWhale', address: 'GA5X4...M8ST', score: 29890, transactions: 325, volume: '345,670 XLM', change: 22.1 },
+    { id: '5', rank: 5, username: 'DeFiMaster', address: 'GC9KL...N4UV', score: 26780, transactions: 289, volume: '298,450 XLM', change: 8.9 },
+  ];
 
   useEffect(() => {
     if (publicKey) {
@@ -53,6 +82,19 @@ const Dashboard: React.FC = () => {
 
   const closeSidebar = () => {
     setSidebarOpen(false);
+  };
+
+  const getRankIcon = (rank: number) => {
+    switch (rank) {
+      case 1: return '🥇';
+      case 2: return '🥈';
+      case 3: return '🥉';
+      default: return `#${rank}`;
+    }
+  };
+
+  const getChangeColor = (change: number) => {
+    return change >= 0 ? 'text-green-400' : 'text-red-400';
   };
 
   const renderWalletSection = () => (
@@ -179,6 +221,73 @@ const Dashboard: React.FC = () => {
     </div>
   );
 
+  const renderLeaderboardSection = () => (
+    <div className="dashboard-content">
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">Leaderboard</h1>
+        <p className="dashboard-subtitle">Top performers in the Stellar ecosystem</p>
+      </div>
+
+      <div className="dashboard-grid">
+        {/* Leaderboard Card */}
+        <div className="dashboard-card leaderboard-card full-width">
+          <div className="leaderboard-header">
+            <h3 className="card-title">Top Traders</h3>
+            <div className="leaderboard-tabs">
+              <button
+                className={`leaderboard-tab ${leaderboardType === 'weekly' ? 'active' : ''}`}
+                onClick={() => setLeaderboardType('weekly')}
+              >
+                <Clock size={16} />
+                <span>Weekly</span>
+              </button>
+              <button
+                className={`leaderboard-tab ${leaderboardType === 'monthly' ? 'active' : ''}`}
+                onClick={() => setLeaderboardType('monthly')}
+              >
+                <Calendar size={16} />
+                <span>Monthly</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="leaderboard-content">
+            <div className="leaderboard-table">
+              <div className="leaderboard-header-row">
+                <div className="leaderboard-cell rank-cell">Rank</div>
+                <div className="leaderboard-cell user-cell">User</div>
+                <div className="leaderboard-cell score-cell">Score</div>
+                <div className="leaderboard-cell change-cell">Change</div>
+              </div>
+
+              {(leaderboardType === 'weekly' ? weeklyLeaderboard : monthlyLeaderboard).map((entry) => (
+                <div key={entry.id} className="leaderboard-row">
+                  <div className="leaderboard-cell rank-cell">
+                    <span className="rank-icon">{getRankIcon(entry.rank)}</span>
+                  </div>
+                  <div className="leaderboard-cell user-cell">
+                    <div className="user-info">
+                      <div className="username">{entry.username}</div>
+                      <div className="address">{entry.address}</div>
+                    </div>
+                  </div>
+                  <div className="leaderboard-cell score-cell">
+                    <span className="score">{entry.score.toLocaleString()}</span>
+                  </div>
+                  <div className="leaderboard-cell change-cell">
+                    <span className={`change ${getChangeColor(entry.change)}`}>
+                      {entry.change >= 0 ? '+' : ''}{entry.change}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="dashboard-container">
       {/* Mobile Sidebar Overlay */}
@@ -215,7 +324,18 @@ const Dashboard: React.FC = () => {
             }}
           >
             <History size={20} />
-            <span>Transaction History</span>
+            <span>History</span>
+          </button>
+
+          <button
+            className={`sidebar-nav-item ${activeSection === 'leaderboard' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveSection('leaderboard');
+              closeSidebar();
+            }}
+          >
+            <Trophy size={20} />
+            <span>Leaderboard</span>
           </button>
         </nav>
       </aside>
@@ -228,12 +348,15 @@ const Dashboard: React.FC = () => {
             <Menu size={24} />
           </button>
           <h1 className="mobile-title">
-            {activeSection === 'wallet' ? 'Wallet' : 'Transaction History'}
+            {activeSection === 'wallet' ? 'Wallet' : 
+             activeSection === 'transactions' ? 'Transaction History' : 'Leaderboard'}
           </h1>
         </div>
 
         {/* Content */}
-        {activeSection === 'wallet' ? renderWalletSection() : renderTransactionsSection()}
+        {activeSection === 'wallet' ? renderWalletSection() : 
+         activeSection === 'transactions' ? renderTransactionsSection() : 
+         renderLeaderboardSection()}
       </main>
     </div>
   );
