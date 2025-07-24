@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStellarWallet } from '../contexts/StellarWalletContext';
-import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2 } from 'lucide-react';
+import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2, Menu, X, Wallet, History } from 'lucide-react';
 
 interface Transaction {
   id: string;
@@ -12,10 +12,14 @@ interface Transaction {
   timestamp: string;
 }
 
+type DashboardSection = 'wallet' | 'transactions';
+
 const Dashboard: React.FC = () => {
   const { publicKey } = useStellarWallet();
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState<DashboardSection>('wallet');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (publicKey) {
@@ -43,11 +47,19 @@ const Dashboard: React.FC = () => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  return (
-    <div className="dashboard">
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
+  const renderWalletSection = () => (
+    <div className="dashboard-content">
       <div className="dashboard-header">
-        <h1 className="dashboard-title">Dashboard</h1>
-        <p className="dashboard-subtitle">Your Stellar wallet overview</p>
+        <h1 className="dashboard-title">Wallet Overview</h1>
+        <p className="dashboard-subtitle">Your Stellar wallet information</p>
       </div>
 
       <div className="dashboard-grid">
@@ -93,8 +105,42 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
+        {/* Analytics Card */}
+        <div className="dashboard-card analytics-card">
+          <h3 className="card-title">Analytics</h3>
+          <div className="analytics-grid">
+            <div className="analytics-item">
+              <div className="analytics-value">0</div>
+              <div className="analytics-label">Total Transactions</div>
+            </div>
+            <div className="analytics-item">
+              <div className="analytics-value">0 XLM</div>
+              <div className="analytics-label">Total Sent</div>
+            </div>
+            <div className="analytics-item">
+              <div className="analytics-value">0 XLM</div>
+              <div className="analytics-label">Total Received</div>
+            </div>
+            <div className="analytics-item">
+              <div className="analytics-value">0</div>
+              <div className="analytics-label">Active DCA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderTransactionsSection = () => (
+    <div className="dashboard-content">
+      <div className="dashboard-header">
+        <h1 className="dashboard-title">Transaction History</h1>
+        <p className="dashboard-subtitle">Your recent Stellar transactions</p>
+      </div>
+
+      <div className="dashboard-grid">
         {/* Recent Transactions Card */}
-        <div className="dashboard-card transactions-card">
+        <div className="dashboard-card transactions-card full-width">
           <h3 className="card-title">Recent Transactions</h3>
           {loading ? (
             <div className="loading-spinner">
@@ -129,30 +175,66 @@ const Dashboard: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* Analytics Card */}
-        <div className="dashboard-card analytics-card">
-          <h3 className="card-title">Analytics</h3>
-          <div className="analytics-grid">
-            <div className="analytics-item">
-              <div className="analytics-value">0</div>
-              <div className="analytics-label">Total Transactions</div>
-            </div>
-            <div className="analytics-item">
-              <div className="analytics-value">0 XLM</div>
-              <div className="analytics-label">Total Sent</div>
-            </div>
-            <div className="analytics-item">
-              <div className="analytics-value">0 XLM</div>
-              <div className="analytics-label">Total Received</div>
-            </div>
-            <div className="analytics-item">
-              <div className="analytics-value">0</div>
-              <div className="analytics-label">Active DCA</div>
-            </div>
-          </div>
-        </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="dashboard-container">
+      {/* Mobile Sidebar Overlay */}
+      {sidebarOpen && (
+        <div className="sidebar-overlay" onClick={closeSidebar}></div>
+      )}
+
+      {/* Sidebar */}
+      <aside className={`dashboard-sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
+        <div className="sidebar-header">
+          <h2 className="sidebar-title">Dashboard</h2>
+          <button className="sidebar-close-btn" onClick={closeSidebar}>
+            <X size={20} />
+          </button>
+        </div>
+        
+        <nav className="sidebar-nav">
+          <button
+            className={`sidebar-nav-item ${activeSection === 'wallet' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveSection('wallet');
+              closeSidebar();
+            }}
+          >
+            <Wallet size={20} />
+            <span>Wallet</span>
+          </button>
+          
+          <button
+            className={`sidebar-nav-item ${activeSection === 'transactions' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveSection('transactions');
+              closeSidebar();
+            }}
+          >
+            <History size={20} />
+            <span>Transaction History</span>
+          </button>
+        </nav>
+      </aside>
+
+      {/* Main Content */}
+      <main className="dashboard-main">
+        {/* Mobile Header */}
+        <div className="mobile-header">
+          <button className="mobile-menu-btn" onClick={toggleSidebar}>
+            <Menu size={24} />
+          </button>
+          <h1 className="mobile-title">
+            {activeSection === 'wallet' ? 'Wallet' : 'Transaction History'}
+          </h1>
+        </div>
+
+        {/* Content */}
+        {activeSection === 'wallet' ? renderWalletSection() : renderTransactionsSection()}
+      </main>
     </div>
   );
 };

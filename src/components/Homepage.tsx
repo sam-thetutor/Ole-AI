@@ -1,9 +1,9 @@
 import React from 'react';
-import { useStellarWallet } from '../contexts/StellarWalletContext';
 import { MessageSquare, BarChart3, RefreshCw, TrendingUp } from 'lucide-react';
+import logoImage from '../assets/logo.png';
 
 const Homepage: React.FC = () => {
-  const { connect, isConnected } = useStellarWallet();
+  // const { connect, isConnected } = useStellarWallet();
 
   return (
     <div className="homepage">
@@ -20,7 +20,7 @@ const Homepage: React.FC = () => {
             investments with natural language commands.
           </p>
           
-          {!isConnected ? (
+          {/* {!isConnected ? (
             <div className="cta-section">
               <button 
                 className="connect-wallet-btn primary-btn"
@@ -40,15 +40,24 @@ const Homepage: React.FC = () => {
                 Your wallet is connected. Ready to explore the Stellar universe?
               </p>
             </div>
-          )}
+          )} */}
+          <div className="cta-section">
+            <button 
+              className="connect-wallet-btn primary-btn"
+            >
+              <span className="btn-glow"></span>
+              Discover More
+            </button>
+          </div>
         </div>
         
         <div className="hero-visual">
           <div className="floating-elements">
-            <div className="floating-orb orb-1"></div>
-            <div className="floating-orb orb-2"></div>
-            <div className="floating-orb orb-3"></div>
-            <div className="grid-lines"></div>
+            {/* <div className="floating-orb orb-1"></div> */}
+            {/* <div className="floating-orb orb-2"></div> */}
+            {/* <div className="floating-orb orb-3"></div> */}
+            <img src={logoImage} alt="Ole"  className="floating-orb" />
+            {/* <div className="grid-lines"></div> */}
           </div>
         </div>
       </div>
