@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStellarWallet } from '../contexts/StellarWalletContext';
+import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext';
 
 const ConnectWalletButton: React.FC = () => {
   const { publicKey, connect, isConnected, connecting } = useStellarWallet();

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useStellarWallet } from '../contexts/StellarWalletContext';
+import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext';
 import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2, Menu, X, Wallet, History, Trophy, Calendar, Clock } from 'lucide-react';
 
 interface Transaction {

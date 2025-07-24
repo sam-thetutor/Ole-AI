@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { useStellarWallet } from '../contexts/StellarWalletContext'
+import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext'
 import { Menu, X, ChevronDown, Copy, Check, Wallet } from 'lucide-react'
-import ConnectButton from '../hooks/ConnectButton'
+import ConnectButton from '../../common/Button/ConnectButton'
 
 const Navbar: React.FC = () => {
   const { publicKey, connect, disconnect } = useStellarWallet()

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { useStellarWallet } from '../contexts/StellarWalletContext'
+import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext'
 
 interface Message {
   id: string

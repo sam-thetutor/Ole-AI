@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useStellarWallet } from '../contexts/StellarWalletContext';
+import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

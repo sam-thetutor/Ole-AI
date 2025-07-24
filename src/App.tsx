@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { StellarWalletProvider } from './contexts/StellarWalletContext'
-import Navbar from './components/Navbar'
-import Homepage from './components/Homepage'
-import Dashboard from './components/Dashboard'
-import ChatInterface from './components/ChatInterface'
-import ProtectedRoute from './components/ProtectedRoute'
+import { StellarWalletProvider } from './contexts/StellarWalletContext/StellarWalletContext'
+import Navbar from './components/layout/Navbar/Navbar'
+import Homepage from './components/homepage/Homepage/Homepage'
+import Dashboard from './components/dashboard/Dashboard/Dashboard'
+import ChatInterface from './components/chat/ChatInterface/ChatInterface'
+import ProtectedRoute from './components/layout/ProtectedRoute/ProtectedRoute'
 import './App.css'
 
 function App() {
