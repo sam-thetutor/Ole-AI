@@ -1,6 +1,6 @@
 import React from 'react';
 import { useStellarWallet } from '../contexts/StellarWalletContext';
-import { MessageSquare, BarChart3, RefreshCw, TrendingUp, Zap } from 'lucide-react';
+import { MessageSquare, BarChart3, RefreshCw, TrendingUp } from 'lucide-react';
 
 const Homepage: React.FC = () => {
   const { connect, isConnected } = useStellarWallet();
