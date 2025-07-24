@@ -13,7 +13,7 @@ interface Transaction {
 }
 
 const Dashboard: React.FC = () => {
-  const { publicKey, balance, fetchRecentPayments } = useStellarWallet();
+  const { publicKey } = useStellarWallet();
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,20 +28,9 @@ const Dashboard: React.FC = () => {
     
     try {
       setLoading(true);
-      const payments = await fetchRecentPayments(publicKey, 10);
-      
-      // Transform the payments data to match our interface
-      const transactions = payments.map((payment: any) => ({
-        id: payment.id,
-        type: payment.type,
-        amount: payment.amount || '0',
-        asset: payment.asset_type === 'native' ? 'XLM' : payment.asset_code,
-        from: payment.from || 'Unknown',
-        to: payment.to || 'Unknown',
-        timestamp: new Date(payment.created_at).toLocaleDateString()
-      }));
-      
-      setRecentTransactions(transactions);
+      // For now, we'll use empty transactions since we removed the fetchRecentPayments
+      // You can implement this functionality later if needed
+      setRecentTransactions([]);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -72,7 +61,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="detail-item">
               <span className="detail-label">Balance:</span>
-              <span className="detail-value balance-value">{balance} XLM</span>
+              <span className="detail-value balance-value">N/A</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Status:</span>
