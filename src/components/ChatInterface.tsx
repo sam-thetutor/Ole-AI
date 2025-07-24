@@ -10,7 +10,7 @@ interface Message {
 }
 
 const ChatInterface: React.FC = () => {
-  const { publicKey, isConnected } = useStellarWallet()
+  const { isConnected } = useStellarWallet()
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
