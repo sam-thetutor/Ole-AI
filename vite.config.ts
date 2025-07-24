@@ -7,18 +7,4 @@ export default defineConfig({
   define: {
     global: 'globalThis',
   },
-  resolve: {
-    alias: {
-      crypto: 'crypto-js',
-      buffer: 'buffer',
-    },
-  },
-  optimizeDeps: {
-    include: ['@creit.tech/stellar-wallets-kit', 'buffer'],
-  },
-  build: {
-    rollupOptions: {
-      external: ['crypto'],
-    },
-  },
 })
