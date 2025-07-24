@@ -1,9 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
 import {
   StellarWalletsKit,
   WalletNetwork,
   allowAllModules,
-  FREIGHTER_ID,
   LOBSTR_ID,
 } from '@creit.tech/stellar-wallets-kit';
 
