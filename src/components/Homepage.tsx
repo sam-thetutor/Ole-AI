@@ -56,8 +56,8 @@ const Homepage: React.FC = () => {
             {/* <div className="floating-orb orb-1"></div> */}
             {/* <div className="floating-orb orb-2"></div> */}
             {/* <div className="floating-orb orb-3"></div> */}
-            <img src={logoImage} alt="Ole"  className="floating-orb" />
-            {/* <div className="grid-lines"></div> */}
+            <img src={logoImage} alt="Ole"  className="floating-orb orb-3" />
+            <div className="grid-lines"></div>
           </div>
         </div>
       </div>
