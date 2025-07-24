@@ -43,7 +43,6 @@
   color: #00ff88;
   font-size: 1.2rem;
   font-weight: 700;
-  font-family: 'Audiowide', monospace;
   margin: 0;
   text-align: left;
   display: flex;
@@ -166,7 +165,6 @@
   color: #00ff88;
   font-size: 2rem;
   font-weight: 700;
-  font-family: 'Audiowide', monospace;
   margin: 0 0 0.5rem 0;
   text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
 }
@@ -220,7 +218,6 @@
   font-size: 1.2rem;
   font-weight: 600;
   margin: 0 0 1rem 0;
-  font-family: 'Audiowide', monospace;
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 

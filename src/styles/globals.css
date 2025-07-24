@@ -1,115 +1,49 @@
-@import url('https://fonts.googleapis.com/css2?family=Audiowide&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  font-family: 'Audiowide', system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: dark;
-  color: #00ff88;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #00ff88;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #00cc6a;
+/* Global Font Family - Alien Tech Theme */
+html, body, #root, #root *, div, span, p, h1, h2, h3, h4, h5, h6, button, input, textarea, label, a {
+  font-family: 'Audiowide', monospace !important;
 }
 
 body {
   margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-  position: relative;
+  padding: 0;
+  background: #000;
+  color: #fff;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(circle at 20% 80%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(255, 0, 255, 0.05) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: -1;
+/* Font Weight Classes for Alien Tech */
+.font-alien-light { font-weight: 400; }
+.font-alien-normal { font-weight: 500; }
+.font-alien-medium { font-weight: 600; }
+.font-alien-bold { font-weight: 700; }
+.font-alien-extrabold { font-weight: 800; }
+.font-alien-black { font-weight: 900; }
+
+/* Special Alien Tech Typography */
+.alien-title {
+  font-family: 'Audiowide', monospace;
+  font-weight: 800;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-  font-weight: 700;
-  text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+.alien-subtitle {
+  font-family: 'Audiowide', monospace;
+  font-weight: 600;
+  letter-spacing: 1px;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+.alien-body {
+  font-family: 'Audiowide', monospace;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+}
+
+/* Monospace for addresses and technical data */
+.alien-mono {
+  font-family: 'Courier New', monospace;
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-button:hover {
-  border-color: #00ff88;
-  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
-}
-button:focus,
-button:focus-visible {
-  outline: 2px solid #00ff88;
-  outline-offset: 2px;
-}
-
-/* Alien tech scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #00ff88, #00cc6a);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #00cc6a, #00994d);
-}
-
-/* Glowing text effect */
-@keyframes glow {
-  0%, 100% {
-    text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-  }
-  50% {
-    text-shadow: 0 0 30px rgba(0, 255, 136, 0.8), 0 0 40px rgba(0, 255, 136, 0.3);
-  }
-}
-
-/* Matrix rain effect */
-@keyframes matrix-rain {
-  0% {
-    transform: translateY(-100vh);
-  }
-  100% {
-    transform: translateY(100vh);
-  }
 }

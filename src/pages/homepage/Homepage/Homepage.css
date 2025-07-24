@@ -1,0 +1,347 @@
+/* Homepage Styles - Alien Tech Theme */
+.homepage {
+  min-height: 100vh;
+  padding: 2rem 0;
+}
+
+/* Hero Section */
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4rem;
+  padding: 4rem 0;
+  position: relative;
+}
+
+.hero-content {
+  flex: 1;
+  max-width: 600px;
+}
+
+.hero-title {
+  font-size: 4rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 1.5rem 0;
+  line-height: 1.1;
+  text-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 2rem 0;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.cta-section {
+  margin-top: 2rem;
+}
+
+.connect-wallet-btn {
+  background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+  border: 2px solid #00ff88;
+  color: #000;
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.connect-wallet-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.connect-wallet-btn:hover::before {
+  left: 100%;
+}
+
+.connect-wallet-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(0, 255, 136, 0.4);
+  border-color: #00cc6a;
+}
+
+.cta-subtitle {
+  color: rgba(0, 255, 136, 0.7);
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  font-style: italic;
+}
+
+.welcome-section {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.welcome-title {
+  color: #00ff88;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.welcome-text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Hero Visual */
+.hero-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  min-height: 400px;
+}
+
+.floating-elements {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  overflow: visible;
+}
+
+.floating-orb {
+  position: absolute;
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+  z-index: 2;
+}
+
+.orb-1 {
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(0, 255, 136, 0.3) 0%, rgba(0, 255, 136, 0.1) 70%, transparent 100%);
+  top: 20%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, rgba(0, 255, 255, 0.1) 70%, transparent 100%);
+  top: 60%;
+  right: 30%;
+  animation-delay: 2s;
+}
+
+.orb-3 {
+  width: 300px;
+  height: 300px;
+  background: none;
+  bottom: 10%;
+  left: 20%;
+  transform: translateX(-50%);
+  animation-delay: 4s;
+}
+
+.orb-3 img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.grid-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(0, 255, 136, 0.3) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 136, 0.3) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes grid-move {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+/* Features Section */
+.features-section {
+  padding: 4rem 0;
+  margin-top: 4rem;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #00ff88;
+  margin: 0 0 3rem 0;
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 255, 136, 0.2);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.feature-card:hover::before {
+  left: 100%;
+}
+
+.feature-card:hover {
+  border-color: rgba(0, 255, 136, 0.4);
+  box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+  transform: translateY(-5px);
+}
+
+.feature-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 80px;
+  background: rgba(0, 255, 136, 0.1);
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  color: #00ff88;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  background: rgba(0, 255, 136, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+}
+
+.feature-card h3 {
+  color: #00ff88;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.feature-card p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .hero-section {
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem 0;
+    text-align: center;
+  }
+  
+  .hero-content {
+    max-width: 100%;
+  }
+  
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1rem;
+  }
+  
+  .hero-visual {
+    min-height: 300px;
+  }
+  
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+  
+  .feature-card {
+    padding: 1.5rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+  
+  .connect-wallet-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .feature-card {
+    padding: 1rem;
+  }
+  
+  .feature-card h3 {
+    font-size: 1.1rem;
+  }
+  
+  .feature-card p {
+    font-size: 0.9rem;
+  }
+} 

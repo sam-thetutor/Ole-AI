@@ -84,6 +84,9 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   animation: gradient-shift 3s ease-in-out infinite;
+  font-family: 'Orbitron', monospace;
+  font-weight: 800;
+  letter-spacing: 2px;
 }
 
 /* Global Button Styles */

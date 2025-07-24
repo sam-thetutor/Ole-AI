@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext'
+import './ChatInterface.css'
 
 interface Message {
   id: string

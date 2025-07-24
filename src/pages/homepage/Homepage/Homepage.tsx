@@ -1,6 +1,7 @@
 import React from 'react';
 import { MessageSquare, BarChart3, RefreshCw, TrendingUp } from 'lucide-react';
 import logoImage from '../../../assets/logo.png';
+import './Homepage.css';
 
 const Homepage: React.FC = () => {
   // const { connect, isConnected } = useStellarWallet();
@@ -53,10 +54,9 @@ const Homepage: React.FC = () => {
         
         <div className="hero-visual">
           <div className="floating-elements">
-            {/* <div className="floating-orb orb-1"></div> */}
-            {/* <div className="floating-orb orb-2"></div> */}
-            {/* <div className="floating-orb orb-3"></div> */}
-            <img src={logoImage} alt="Ole"  className="floating-orb orb-3" />
+            <div className="floating-orb orb-1"></div>
+            <div className="floating-orb orb-2"></div>
+            <img src={logoImage} alt="Ole" className="floating-orb orb-3" />
             <div className="grid-lines"></div>
           </div>
         </div>
