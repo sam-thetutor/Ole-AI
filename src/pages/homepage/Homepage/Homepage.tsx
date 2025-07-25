@@ -13,7 +13,7 @@ const Homepage: React.FC = () => {
           <h1 className="hero-title">
             <span className="gradient-text">OLE</span>
             <br />
-            
+            <span className="gradient-text">AI Agent</span>
           </h1>
           <p className="hero-subtitle">
             Prompt your way into the Stellar Universe. The only AI-powered portal 
