@@ -13,12 +13,12 @@ const Homepage: React.FC = () => {
           <h1 className="hero-title">
             <span className="gradient-text">OLE</span>
             <br />
-            AI Agent
+            
           </h1>
           <p className="hero-subtitle">
-            Your intelligent companion for navigating the Stellar blockchain. 
-            Send tokens, create payment links, check balances, and manage your 
-            investments with natural language commands.
+            Prompt your way into the Stellar blockchain. The only AI-powered portal 
+            to seamlessly navigate, trade, and manage your digital assets with 
+            natural language commands.
           </p>
           
           {/* {!isConnected ? (
