@@ -4,6 +4,7 @@ import { useStellarWallet } from '../../../contexts/StellarWalletContext/Stellar
 import { Menu, X, ChevronDown, Copy, Check, Wallet } from 'lucide-react'
 import ConnectButton from '../../common/Button/ConnectButton'
 import './Navbar.css'
+import logo from '../../../assets/logo.png'
 
 const Navbar: React.FC = () => {
   const { publicKey, connect, disconnect } = useStellarWallet()
@@ -83,7 +84,7 @@ const Navbar: React.FC = () => {
       <div className="navbar-left">
         <div className="navbar-brand">
           <Link to="/" className="brand-link">
-            <h1>OLE</h1>
+            <img src={logo} alt="OLE" style={{width: '60px', height: '60px'}} />
           </Link>
         </div>
       </div>

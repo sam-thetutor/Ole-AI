@@ -16,7 +16,7 @@ const Homepage: React.FC = () => {
             
           </h1>
           <p className="hero-subtitle">
-            Prompt your way into the Stellar blockchain. The only AI-powered portal 
+            Prompt your way into the Stellar Universe. The only AI-powered portal 
             to seamlessly navigate, trade, and manage your digital assets with 
             natural language commands.
           </p>
