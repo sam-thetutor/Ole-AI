@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import tokenService from '../services/tokenService';
-// import userService from '../services/userService';
-// import walletService from '../services/walletService';
+import userService from '../services/userService';
+import walletService from '../services/walletService';
 import { validateAuthRequest, validateTokenRequest } from '../utils/validation';
 import { authLimiter } from '../config/rateLimit';
 
@@ -17,12 +17,24 @@ router.post('/connect', authLimiter, validateAuthRequest, async (req: Request, r
     // In production, you should verify the signature to ensure the user owns the wallet
 
     // Create or get user
-    // const user = await userService.createUser(walletAddress);
+    const user = await userService.createUser(walletAddress);
     
     // Update user's last login
-    // if (user && user._id) {
-    //   await userService.updateUserLastLogin(user._id.toString());
-    // }
+    if (user && user._id) {
+      await userService.updateUserLastLogin(user._id.toString());
+    }
+
+    // MANDATORY: Generate a wallet for the user (this is required for first-time users)
+    let generatedWallet = null;
+    const existingWallet = await walletService.getPrimaryWalletByUserId(user._id?.toString() || '');
+    if (!existingWallet) {
+      console.log(`Generating new wallet for user: ${user._id}`);
+      generatedWallet = await walletService.generateNewWallet(user._id?.toString() || '', 'testnet');
+      console.log(`✅ Wallet generated successfully: ${generatedWallet.publicKey}`);
+    } else {
+      console.log(`User already has wallet: ${existingWallet.publicKey}`);
+      generatedWallet = existingWallet;
+    }
 
     // Generate token pair
     const tokens = tokenService.generateTokenPair(walletAddress);
@@ -32,7 +44,12 @@ router.post('/connect', authLimiter, validateAuthRequest, async (req: Request, r
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
       expiresIn: tokens.expiresIn,
-      refreshExpiresIn: tokens.refreshExpiresIn
+      refreshExpiresIn: tokens.refreshExpiresIn,
+      generatedWallet: generatedWallet ? {
+        publicKey: generatedWallet.publicKey,
+        network: generatedWallet.network,
+        isNewUser: !existingWallet
+      } : null
     };
 
     const statusCode = 200;
