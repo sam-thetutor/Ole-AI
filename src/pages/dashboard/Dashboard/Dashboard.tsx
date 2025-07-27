@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext';
-import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2, Menu, X, Wallet, History, Trophy, Calendar, Clock } from 'lucide-react';
+import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2, Menu, X, Wallet, History, Trophy, Calendar, Clock, Link } from 'lucide-react';
 import apiService from '../../../services/api';
+import PaymentLinks from '../PaymentLinks/PaymentLinks';
 import './Dashboard.css';
 
 interface Transaction {
@@ -43,12 +44,16 @@ interface LeaderboardEntry {
   change: number; // percentage change
 }
 
-type DashboardSection = 'wallet' | 'transactions' | 'leaderboard';
+type DashboardSection = 'wallet' | 'transactions' | 'leaderboard' | 'payment-links';
 
 const Dashboard: React.FC = () => {
   const { publicKey, generatedWallet, refreshGeneratedWallet } = useStellarWallet();
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
-  const [dashboardGeneratedWallet, setDashboardGeneratedWallet] = useState<any>(null);
+  const [dashboardGeneratedWallet, setDashboardGeneratedWallet] = useState<{
+    publicKey: string;
+    network: string;
+    balances?: WalletBalance[];
+  } | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<DashboardSection>('wallet');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -116,25 +121,7 @@ const Dashboard: React.FC = () => {
 
 
 
-  const loadGeneratedWalletBalances = async () => {
-    try {
-      console.log('Loading generated wallet balances');
-      const response = await apiService.refreshWalletBalances();
-      console.log('Refresh wallet balances response:', response);
-      
-      if (response.success && response.data) {
-        // Update the dashboard state with fresh data
-        setDashboardGeneratedWallet(response.data);
-        console.log('Generated wallet balances updated in dashboard:', response.data);
-        
-        // Also update the context
-        await refreshGeneratedWallet();
-        console.log('Generated wallet refreshed in context');
-      }
-    } catch (error) {
-      console.error('Error loading generated wallet balances:', error);
-    }
-  };
+
 
   const fetchGeneratedWallet = async () => {
     try {
@@ -621,6 +608,17 @@ const Dashboard: React.FC = () => {
             <Trophy size={20} />
             <span>Leaderboard</span>
           </button>
+
+          <button
+            className={`sidebar-nav-item ${activeSection === 'payment-links' ? 'active' : ''}`}
+            onClick={() => {
+              setActiveSection('payment-links');
+              closeSidebar();
+            }}
+          >
+            <Link size={20} />
+            <span>Payment Links</span>
+          </button>
         </nav>
       </aside>
 
@@ -633,14 +631,16 @@ const Dashboard: React.FC = () => {
           </button>
           <h1 className="mobile-title">
             {activeSection === 'wallet' ? 'Wallet' : 
-             activeSection === 'transactions' ? 'Transaction History' : 'Leaderboard'}
+             activeSection === 'transactions' ? 'Transaction History' : 
+             activeSection === 'leaderboard' ? 'Leaderboard' : 'Payment Links'}
           </h1>
         </div>
 
         {/* Content */}
         {activeSection === 'wallet' ? renderWalletSection() : 
          activeSection === 'transactions' ? renderTransactionsSection() : 
-         renderLeaderboardSection()}
+         activeSection === 'leaderboard' ? renderLeaderboardSection() :
+         <PaymentLinks />}
       </main>
     </div>
   );

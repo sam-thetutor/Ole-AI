@@ -66,6 +66,19 @@ class WalletService {
     }
   }
 
+  // Get wallet by public key (wallet address)
+  async getWalletByPublicKey(publicKey: string): Promise<IWallet | null> {
+    try {
+      return await Wallet.findOne({ 
+        publicKey, 
+        isActive: true 
+      });
+    } catch (error) {
+      console.error('Error getting wallet by public key:', error);
+      throw error;
+    }
+  }
+
   // Get wallet balances from Stellar network
   async getWalletBalanceFromStellar(publicKey: string): Promise<StellarBalance[]> {
     try {
@@ -310,3 +323,17 @@ class WalletService {
 }
 
 export default new WalletService(); 
+
+
+
+
+// stellar contract deploy \
+//   --wasm target/wasm32v1-none/release/hello_world.wasm \
+//   --source alice \
+//   --network testnet \
+//   --alias hello_world
+
+//   stellar contract bindings typescript \
+//   --network testnet \
+//   --contract-id CAVPRBSNLSMZ3DW7MZUFK7RCZKHO3LQS2LTJ3WBVILIQGEO4S4K3GGCZ \
+//   --output-dir packages/hello_world

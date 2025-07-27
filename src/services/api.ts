@@ -1,5 +1,5 @@
- const API_BASE_URL = 'https://ole-be-production.up.railway.app/api';
-//const API_BASE_URL = 'http://localhost:3001/api';
+ //const API_BASE_URL = 'https://ole-be-production.up.railway.app/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -86,6 +86,19 @@ interface ChatTool {
 interface ChatToolsResponse {
   tools: ChatTool[];
   count: number;
+}
+
+interface PaymentLinkData {
+  linkId: string;
+  type: 'fixed' | 'global';
+  amount?: number;
+  title?: string;
+  description?: string;
+  creator: string;
+  createdAt: string;
+  status: 'pending' | 'paid';
+  totalContributions?: number;
+  totalContributors?: number;
 }
 
 class ApiService {
@@ -308,6 +321,49 @@ class ApiService {
 
   async checkChatHealth(): Promise<ApiResponse<{ message: string; timestamp: string; availableTools: number }>> {
     return await this.request<{ message: string; timestamp: string; availableTools: number }>('/chat/health');
+  }
+
+  // Payment Link methods
+  async getPaymentLink(linkId: string): Promise<ApiResponse<PaymentLinkData>> {
+    return await this.request<PaymentLinkData>(`/payment-links/${linkId}`);
+  }
+
+  async payFixedLink(linkId: string, amount: number): Promise<ApiResponse<any>> {
+    return await this.request('/payment-links/pay-fixed', {
+      method: 'POST',
+      body: JSON.stringify({ linkId, amount }),
+    });
+  }
+
+  async contributeToGlobalLink(linkId: string, amount: number): Promise<ApiResponse<any>> {
+    return await this.request('/payment-links/contribute', {
+      method: 'POST',
+      body: JSON.stringify({ linkId, amount }),
+    });
+  }
+
+  async getUserPaymentLinks(): Promise<ApiResponse<PaymentLinkData[]>> {
+    const walletAddress = this.getWalletAddressFromToken();
+    if (!walletAddress) {
+      return {
+        success: false,
+        message: 'User not authenticated',
+        data: []
+      };
+    }
+    return await this.request<PaymentLinkData[]>(`/payment-links/user/${walletAddress}`);
+  }
+
+  async getPaymentLinkStats(): Promise<ApiResponse<any>> {
+    const walletAddress = this.getWalletAddressFromToken();
+    if (!walletAddress) {
+      return {
+        success: false,
+        message: 'User not authenticated',
+        data: null
+      };
+    }
+    return await this.request<any>(`/payment-links/stats/${walletAddress}`);
   }
 }
 

@@ -5,6 +5,8 @@ import Footer from './components/layout/Footer/Footer'
 import Homepage from './pages/homepage/Homepage/Homepage'
 import Dashboard from './pages/dashboard/Dashboard/Dashboard'
 import ChatInterface from './pages/chat/ChatInterface/ChatInterface'
+import PaymentPage from './pages/payment/PaymentPage/PaymentPage'
+import PaymentPageTest from './pages/payment/PaymentPage/PaymentPageTest'
 import ProtectedRoute from './components/layout/ProtectedRoute/ProtectedRoute'
 import './styles/globals.css'
 import './styles/App.css'
@@ -34,6 +36,8 @@ function App() {
                   </ProtectedRoute>
                 } 
               />
+              <Route path="/pay/:linkId" element={<PaymentPage />} />
+              <Route path="/test-payment" element={<PaymentPageTest />} />
             </Routes>
           </main>
           <Footer />

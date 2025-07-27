@@ -12,6 +12,7 @@ import databaseService from './services/databaseService';
 import authRoutes from './routes/auth';
 import apiRoutes from './routes/api';
 import chatRoutes from './routes/chat';
+import paymentLinkRoutes from './routes/paymentLinks';
 
 // Import rate limiting
 // import { generalLimiter } from './config/rateLimit';
@@ -69,6 +70,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/payment-links', paymentLinkRoutes);
 
 // 404 handler
 app.use('*', (req: Request, res: Response) => {

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { HumanMessage } from '@langchain/core/messages';
 import langGraphService from '../services/langGraphService';
 import { chatAuth, chatRateLimit } from '../middleware/chatAuth';
+import userService from '../services/userService';
 
 const router = express.Router();
 
@@ -9,9 +10,9 @@ const router = express.Router();
 router.post('/send', chatAuth, chatRateLimit, async (req: Request, res: Response) => {
   try {
     const { message } = req.body;
-    const userId = req.walletAddress; // Use authenticated wallet address
+    const walletAddress = req.walletAddress; // Use authenticated wallet address
 
-    if (!userId) {
+    if (!walletAddress) {
       return res.status(401).json({
         error: 'Authentication required',
         message: 'Wallet address not found in request'
@@ -22,6 +23,24 @@ router.post('/send', chatAuth, chatRateLimit, async (req: Request, res: Response
       return res.status(400).json({
         error: 'Invalid message',
         message: 'Please provide a valid message'
+      });
+    }
+
+    // Get user ID from database using wallet address
+    const user = await userService.getUserByWalletAddress(walletAddress);
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: 'User not found for this wallet address'
+      });
+    }
+
+    // Use wallet address as userId for consistency with payment links
+    const userId = walletAddress;
+    if (!userId) {
+      return res.status(500).json({
+        error: 'Invalid user ID',
+        message: 'Could not retrieve user ID'
       });
     }
 
