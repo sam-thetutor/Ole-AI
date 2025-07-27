@@ -1,5 +1,7 @@
 import { HumanMessage } from "@langchain/core/messages";
 import { getBalanceTool } from "../tools/balanceTool";
+import { getWalletInfoTool } from "../tools/walletInfoTool";
+import { sendTokensTool } from "../tools/sendTokensTool";
 
 interface ProcessMessageResult {
   success: boolean;
@@ -21,6 +23,14 @@ class LangGraphService {
     {
       name: "get_stellar_balance",
       description: "Get the current balance of tokens in the user's Stellar wallet"
+    },
+    {
+      name: "get_wallet_info",
+      description: "Get the user's wallet public key and basic wallet information"
+    },
+    {
+      name: "send_tokens",
+      description: "Send XLM tokens to another Stellar wallet address"
     }
   ];
 
@@ -28,11 +38,70 @@ class LangGraphService {
     try {
       const messageContent = userMessage.content as string;
       
+      // Handle send token requests
+      if (messageContent.toLowerCase().includes('send') && 
+          (messageContent.toLowerCase().includes('xlm') || messageContent.toLowerCase().includes('stellar'))) {
+        
+        try {
+          // Parse the message to extract amount and destination
+          const sendMatch = messageContent.match(/send\s+(\d+(?:\.\d+)?)\s*xlm\s+to\s+([A-Z0-9]{56})/i);
+          
+          if (!sendMatch) {
+            return {
+              success: true,
+              response: `❌ **Invalid Format:** Please use the format "send [amount] XLM to [address]".\n\nExample: "send 10 XLM to GABC123..."`
+            };
+          }
+          
+          const amount = sendMatch[1];
+          const destination = sendMatch[2];
+          
+          const sendParams = {
+            amount: amount,
+            destination: destination,
+            asset: 'XLM'
+          };
+          
+          const sendResult = await sendTokensTool.func(userId, sendParams);
+          return {
+            success: true,
+            response: sendResult
+          };
+        } catch (error: any) {
+          console.error('Send tokens tool error:', error);
+          return {
+            success: true,
+            response: `I couldn't process your send request at the moment. Please try again later. Error: ${error.message}`
+          };
+        }
+      }
+      
+      // Handle wallet info requests
+      if (messageContent.toLowerCase().includes('public key') || 
+          messageContent.toLowerCase().includes('wallet address') ||
+          messageContent.toLowerCase().includes('wallet info') ||
+          messageContent.toLowerCase().includes('my wallet') ||
+          messageContent.toLowerCase().includes('show my wallet')) {
+        
+        try {
+          const walletInfoResult = await getWalletInfoTool.func(userId);
+          return {
+            success: true,
+            response: walletInfoResult
+          };
+        } catch (error: any) {
+          console.error('Wallet info tool error:', error);
+          return {
+            success: true,
+            response: `I couldn't fetch your wallet information at the moment. Please make sure your wallet is connected and try again. Error: ${error.message}`
+          };
+        }
+      }
+      
       // Handle balance requests
       if (messageContent.toLowerCase().includes('balance') || 
           messageContent.toLowerCase().includes('tokens') ||
           messageContent.toLowerCase().includes('holdings') ||
-          messageContent.toLowerCase().includes('wallet') ||
           messageContent.toLowerCase().includes('xlm') ||
           messageContent.toLowerCase().includes('stellar')) {
         
@@ -83,7 +152,7 @@ class LangGraphService {
       // Default response for other messages
       return {
         success: true,
-        response: `Hello! I'm OLE AI Agent. I can help you with:\n\n• Getting the current date and time\n• Checking your Stellar wallet balance\n\nTry asking me "What's the current time?" or "What's my wallet balance?"`
+        response: `Hello! I'm OLE AI Agent. I can help you with:\n\n• Getting the current date and time\n• Checking your Stellar wallet balance\n• Showing your wallet public key and information\n• Sending XLM tokens to other addresses\n\nTry asking me:\n• "What's the current time?"\n• "What's my wallet balance?"\n• "Show my wallet info"\n• "Send 10 XLM to GABC123..."`
       };
 
     } catch (error: any) {

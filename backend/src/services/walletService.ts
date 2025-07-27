@@ -144,7 +144,7 @@ class WalletService {
   }
 
   // Decrypt secret key
-  private decryptSecretKey(encryptedSecretKey: string): string {
+  public decryptSecretKey(encryptedSecretKey: string): string {
     const algorithm = 'aes-256-cbc';
     const key = crypto.scryptSync(this.encryptionKey, 'salt', 32);
     

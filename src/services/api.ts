@@ -1,4 +1,5 @@
-//const API_BASE_URL = 'http://localhost:3001/api';
+ //const API_BASE_URL = 'https://ole-be-production.up.railway.app/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -29,14 +30,7 @@ interface WalletData {
   lastBalanceCheck: string;
 }
 
-interface WalletBalance {
-  walletAddress: string;
-  balance: {
-    XLM: string;
-    USDC: string;
-  };
-  lastUpdated: string;
-}
+
 
 interface Transaction {
   id: string;
@@ -75,13 +69,7 @@ interface LeaderboardResponse {
   lastUpdated: string;
 }
 
-interface ChatMessage {
-  id: string;
-  text: string;
-  sender: 'user' | 'ai';
-  timestamp: string;
-  data?: any;
-}
+
 
 interface ChatResponse {
   response: string;

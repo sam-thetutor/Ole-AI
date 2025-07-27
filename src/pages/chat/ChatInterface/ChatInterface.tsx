@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext'
 import apiService from '../../../services/api'
+import MarkdownRenderer from '../../../components/common/MarkdownRenderer/MarkdownRenderer'
 import './ChatInterface.css'
 
 interface Message {
@@ -16,7 +17,7 @@ const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Hello! I\'m your Stellar AI Agent. Connect your wallet to start managing your blockchain assets with natural language prompts.',
+      text: '**Hello! I\'m your Stellar AI Agent.** 🤖\n\nConnect your wallet to start managing your blockchain assets with natural language prompts.\n\nI can help you with:\n• **Getting the current date and time**\n• **Checking your Stellar wallet balance**\n• **Showing your wallet public key and information**\n• **Sending XLM tokens to other addresses**\n\nTry asking me:\n• "What\'s the current time?"\n• "What\'s my wallet balance?"\n• "Show my wallet info"\n• "Send 10 XLM to GABC123..."',
       sender: 'ai',
       timestamp: new Date()
     }
@@ -39,22 +40,9 @@ const ChatInterface: React.FC = () => {
     if (isConnected) {
       const checkAuth = async () => {
         try {
-          console.log('Checking authentication...')
           const authStatus = await apiService.verifyToken()
-          console.log('Auth status:', authStatus)
           setIsAuthenticated(authStatus.valid)
-          
-          if (authStatus.valid) {
-            // Check chat health
-            console.log('Checking chat health...')
-            const healthCheck = await apiService.checkChatHealth()
-            console.log('Health check:', healthCheck)
-            if (healthCheck.success) {
-              console.log('Chat service is healthy:', healthCheck.data)
-            }
-          }
         } catch (error) {
-          console.error('Authentication check failed:', error)
           setIsAuthenticated(false)
         }
       }
@@ -66,9 +54,7 @@ const ChatInterface: React.FC = () => {
   }, [isConnected])
 
   const handleSendMessage = async () => {
-    console.log('Send message called:', { inputValue: inputValue.trim(), isConnected, isAuthenticated })
     if (!inputValue.trim() || !isConnected || !isAuthenticated) {
-      console.log('Message send blocked:', { hasInput: !!inputValue.trim(), isConnected, isAuthenticated })
       return
     }
 
@@ -85,12 +71,9 @@ const ChatInterface: React.FC = () => {
 
     try {
       // Send message to backend AI service
-      console.log('Sending message to backend:', inputValue.trim())
       const response = await apiService.sendChatMessage(inputValue.trim())
-      console.log('Backend response:', response)
       
       if (response.success && response.data) {
-        console.log('Response data:', response.data)
         const aiResponse: Message = {
           id: (Date.now() + 1).toString(),
           text: response.data.response,
@@ -103,12 +86,9 @@ const ChatInterface: React.FC = () => {
         throw new Error(response.message || 'Failed to get response from AI')
       }
     } catch (error) {
-      console.error('Error sending message:', error)
-      
       let errorText = 'Sorry, I encountered an error processing your request. Please try again.'
       
       if (error instanceof Error) {
-        console.log('Error message:', error.message)
         if (error.message.includes('401')) {
           errorText = 'Authentication failed. Please reconnect your wallet and try again.'
           setIsAuthenticated(false)
@@ -116,9 +96,6 @@ const ChatInterface: React.FC = () => {
           errorText = 'Too many requests. Please wait a moment before trying again.'
         } else if (error.message.includes('Network error')) {
           errorText = 'Network error. Please check your connection and try again.'
-        } else {
-          // Show the actual error for debugging
-          errorText = `Error: ${error.message}`
         }
       }
       
@@ -148,36 +125,6 @@ const ChatInterface: React.FC = () => {
         <div className="wallet-prompt">
           <h2>Connect Your Wallet</h2>
           <p>Please connect your Stellar wallet to start using the AI agent.</p>
-          <div className="wallet-features">
-            <h3>What you can do:</h3>
-            <ul>
-              <li>Send tokens using natural language</li>
-              <li>Check wallet balances</li>
-              <li>Create payment links</li>
-              <li>Swap tokens on Stellar DEX</li>
-              <li>Set up DCA positions</li>
-              <li>Invest based on risk tolerance</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (!isAuthenticated) {
-    return (
-      <div className="chat-container">
-        <div className="wallet-prompt">
-          <h2>Authentication Required</h2>
-          <p>Your wallet is connected but authentication is required. Please try reconnecting your wallet.</p>
-          <div className="wallet-features">
-            <h3>Authentication Status:</h3>
-            <ul>
-              <li>Wallet Connected: ✅</li>
-              <li>Backend Authentication: ❌</li>
-              <li>Chat Service: ❌</li>
-            </ul>
-          </div>
         </div>
       </div>
     )
@@ -192,7 +139,7 @@ const ChatInterface: React.FC = () => {
             className={`message ${message.sender === 'user' ? 'user-message' : 'ai-message'}`}
           >
             <div className="message-content">
-              <p>{message.text}</p>
+              <MarkdownRenderer content={message.text} />
               {message.data && (
                 <div className="message-data">
                   {message.data.transactionHash && (

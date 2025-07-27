@@ -1,0 +1,193 @@
+.markdown-content {
+  font-family: inherit;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+/* Headings */
+.markdown-h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
+  color: inherit;
+}
+
+.markdown-h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0.4rem 0;
+  color: inherit;
+}
+
+.markdown-h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.3rem 0;
+  color: inherit;
+}
+
+/* Paragraphs */
+.markdown-p {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+/* Code blocks */
+.markdown-inline-code {
+  background: rgba(0, 255, 136, 0.1);
+  color: #00ff88;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+  border: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.markdown-code-block {
+  background: rgba(0, 0, 0, 0.8);
+  color: #00ff88;
+  padding: 0.8rem;
+  border-radius: 6px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.9em;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  display: block;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+.markdown-pre {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 0.8rem;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+/* Strong/Bold text */
+.markdown-strong {
+  font-weight: 600;
+  color: #00ff88;
+}
+
+/* Emphasis/Italic text */
+.markdown-em {
+  font-style: italic;
+  opacity: 0.9;
+}
+
+/* Lists */
+.markdown-ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-ol {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.markdown-li {
+  margin: 0.2rem 0;
+  line-height: 1.4;
+}
+
+/* Links */
+.markdown-link {
+  color: #00ff88;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0, 255, 136, 0.3);
+  transition: all 0.2s ease;
+}
+
+.markdown-link:hover {
+  color: #00cc6a;
+  border-bottom-color: #00cc6a;
+  text-decoration: none;
+}
+
+/* Blockquotes */
+.markdown-blockquote {
+  border-left: 3px solid #00ff88;
+  padding-left: 1rem;
+  margin: 0.5rem 0;
+  font-style: italic;
+  opacity: 0.9;
+  background: rgba(0, 255, 136, 0.05);
+  padding: 0.5rem 1rem;
+  border-radius: 0 4px 4px 0;
+}
+
+/* Special styling for AI message context */
+.message.ai-message .markdown-content {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.message.ai-message .markdown-strong {
+  color: #00ff88;
+}
+
+.message.ai-message .markdown-inline-code {
+  background: rgba(0, 255, 136, 0.15);
+  color: #00ff88;
+  border-color: rgba(0, 255, 136, 0.3);
+}
+
+.message.ai-message .markdown-code-block,
+.message.ai-message .markdown-pre {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: rgba(0, 255, 136, 0.4);
+}
+
+.message.ai-message .markdown-link {
+  color: #00ff88;
+  border-bottom-color: rgba(0, 255, 136, 0.4);
+}
+
+.message.ai-message .markdown-link:hover {
+  color: #00cc6a;
+  border-bottom-color: #00cc6a;
+}
+
+.message.ai-message .markdown-blockquote {
+  border-left-color: #00ff88;
+  background: rgba(0, 255, 136, 0.08);
+}
+
+/* Special styling for user message context */
+.message.user-message .markdown-content {
+  color: #000;
+}
+
+.message.user-message .markdown-strong {
+  color: #006633;
+}
+
+.message.user-message .markdown-inline-code {
+  background: rgba(0, 0, 0, 0.1);
+  color: #006633;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.message.user-message .markdown-code-block,
+.message.user-message .markdown-pre {
+  background: rgba(0, 0, 0, 0.1);
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #006633;
+}
+
+.message.user-message .markdown-link {
+  color: #006633;
+  border-bottom-color: rgba(0, 0, 0, 0.3);
+}
+
+.message.user-message .markdown-link:hover {
+  color: #004422;
+  border-bottom-color: #004422;
+}
+
+.message.user-message .markdown-blockquote {
+  border-left-color: #006633;
+  background: rgba(0, 0, 0, 0.05);
+} 
