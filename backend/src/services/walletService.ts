@@ -39,7 +39,14 @@ class WalletService {
       : 'https://horizon.stellar.org';
     
     this.server = new StellarSdk.Horizon.Server(horizonUrl);
-    this.encryptionKey = process.env.WALLET_ENCRYPTION_KEY || 'fallback-encryption-key';
+    
+    // Use a consistent encryption key across environments
+    // This should be the same key used when wallets were originally created
+    this.encryptionKey = process.env.WALLET_ENCRYPTION_KEY || 'your-wallet-encryption-key';
+    
+    if (!process.env.WALLET_ENCRYPTION_KEY) {
+      console.warn('⚠️ WARNING: WALLET_ENCRYPTION_KEY not set. Using fallback key. This may cause decryption issues.');
+    }
   }
 
   // Get primary wallet by user ID
@@ -145,18 +152,27 @@ class WalletService {
 
   // Decrypt secret key
   public decryptSecretKey(encryptedSecretKey: string): string {
-    const algorithm = 'aes-256-cbc';
-    const key = crypto.scryptSync(this.encryptionKey, 'salt', 32);
-    
-    const parts = encryptedSecretKey.split(':');
-    const iv = Buffer.from(parts[0], 'hex');
-    const encrypted = parts[1];
-    
-    const decipher = crypto.createDecipheriv(algorithm, key, iv);
-    let decrypted = decipher.update(encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    
-    return decrypted;
+    try {
+      const algorithm = 'aes-256-cbc';
+      const key = crypto.scryptSync(this.encryptionKey, 'salt', 32);
+      
+      const parts = encryptedSecretKey.split(':');
+      if (parts.length !== 2) {
+        throw new Error('Invalid encrypted secret key format');
+      }
+      
+      const iv = Buffer.from(parts[0], 'hex');
+      const encrypted = parts[1];
+      
+      const decipher = crypto.createDecipheriv(algorithm, key, iv);
+      let decrypted = decipher.update(encrypted, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      
+      return decrypted;
+    } catch (error: any) {
+      console.error('Failed to decrypt secret key:', error);
+      throw new Error(`Decryption failed: ${error.message}. This usually happens when the WALLET_ENCRYPTION_KEY environment variable has changed.`);
+    }
   }
 
   // Update wallet balances in database
@@ -223,6 +239,8 @@ class WalletService {
       throw error;
     }
   }
+
+
 }
 
 export default new WalletService(); 
