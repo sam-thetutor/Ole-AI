@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext';
 import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2, Menu, X, Wallet, History, Trophy, Calendar, Clock } from 'lucide-react';
+import apiService from '../../../services/api';
 import './Dashboard.css';
 
 interface Transaction {
@@ -11,6 +12,18 @@ interface Transaction {
   from: string;
   to: string;
   timestamp: string;
+}
+
+interface WalletBalance {
+  asset_type: string;
+  asset_code?: string;
+  asset_issuer?: string;
+  balance: string;
+  limit?: string;
+  buying_liabilities?: string;
+  selling_liabilities?: string;
+  is_authorized?: boolean;
+  is_authorized_to_maintain_liabilities?: boolean;
 }
 
 interface LeaderboardEntry {
@@ -29,6 +42,7 @@ type DashboardSection = 'wallet' | 'transactions' | 'leaderboard';
 const Dashboard: React.FC = () => {
   const { publicKey, generatedWallet, refreshGeneratedWallet } = useStellarWallet();
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [dashboardGeneratedWallet, setDashboardGeneratedWallet] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<DashboardSection>('wallet');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -57,6 +71,14 @@ const Dashboard: React.FC = () => {
     }
   }, [publicKey]);
 
+  // Debug generated wallet data
+  useEffect(() => {
+    if (generatedWallet) {
+      console.log('Generated wallet data:', generatedWallet);
+      console.log('Generated wallet balances:', generatedWallet.balances);
+    }
+  }, [generatedWallet]);
+
   const loadDashboardData = async () => {
     if (!publicKey) return;
     
@@ -65,6 +87,12 @@ const Dashboard: React.FC = () => {
       // For now, we'll use empty transactions since we removed the fetchRecentPayments
       // You can implement this functionality later if needed
       setRecentTransactions([]);
+      
+      // Fetch generated wallet from backend
+      await fetchGeneratedWallet();
+      
+      // Refresh generated wallet to get latest balances
+      await refreshGeneratedWallet();
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -72,9 +100,63 @@ const Dashboard: React.FC = () => {
     }
   };
 
+
+
+  const loadGeneratedWalletBalances = async () => {
+    try {
+      console.log('Loading generated wallet balances');
+      const response = await apiService.refreshWalletBalances();
+      console.log('Refresh wallet balances response:', response);
+      
+      if (response.success && response.data) {
+        // Update the dashboard state with fresh data
+        setDashboardGeneratedWallet(response.data);
+        console.log('Generated wallet balances updated in dashboard:', response.data);
+        
+        // Also update the context
+        await refreshGeneratedWallet();
+        console.log('Generated wallet refreshed in context');
+      }
+    } catch (error) {
+      console.error('Error loading generated wallet balances:', error);
+    }
+  };
+
+  const fetchGeneratedWallet = async () => {
+    try {
+      console.log('Fetching generated wallet from backend...');
+      const response = await apiService.getGeneratedWallet();
+      console.log('Get generated wallet response:', response);
+      
+      if (response.success && response.data) {
+        setDashboardGeneratedWallet(response.data);
+        console.log('Generated wallet set in dashboard:', response.data);
+      } else {
+        console.error('Failed to fetch generated wallet:', response);
+      }
+    } catch (error) {
+      console.error('Error fetching generated wallet:', error);
+    }
+  };
+
   const formatAddress = (address: string) => {
     if (!address || address === 'Unknown') return 'Unknown';
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  // Filter balances to only show XLM and USDC
+  const filterXLMAndUSDCBalances = (balances: WalletBalance[]): WalletBalance[] => {
+    return balances.filter(balance => {
+      // Include XLM (native asset)
+      if (balance.asset_type === 'native') {
+        return true;
+      }
+      // Include USDC
+      if (balance.asset_code === 'USDC') {
+        return true;
+      }
+      return false;
+    });
   };
 
   const toggleSidebar = () => {
@@ -106,53 +188,63 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="dashboard-grid">
-        {/* Connected Wallet Info Card */}
-        <div className="dashboard-card wallet-info-card">
-          <h3 className="card-title">Connected Wallet</h3>
-          <div className="wallet-details">
-            <div className="detail-item">
-              <span className="detail-label">Public Key:</span>
-              <span className="detail-value">{formatAddress(publicKey || '')}</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">Status:</span>
-              <span className="detail-value status-connected">Connected</span>
-            </div>
-          </div>
-        </div>
-
         {/* Generated Wallet Info Card */}
-        {generatedWallet && (
+        {dashboardGeneratedWallet ? (
           <div className="dashboard-card generated-wallet-card">
             <h3 className="card-title">Generated Wallet</h3>
             <div className="wallet-details">
               <div className="detail-item">
                 <span className="detail-label">Public Key:</span>
-                <span className="detail-value">{formatAddress(generatedWallet.publicKey)}</span>
+                <span className="detail-value">{formatAddress(dashboardGeneratedWallet.publicKey)}</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Network:</span>
-                <span className="detail-value">{generatedWallet.network}</span>
+                <span className="detail-value">{dashboardGeneratedWallet.network}</span>
               </div>
+              {/* <div className="detail-item">
+                <span className="detail-label">Status:</span>
+                <span className="detail-value status-generated">Generated</span>
+              </div> */}
+              {dashboardGeneratedWallet.balances && dashboardGeneratedWallet.balances.length > 0 ? (
+                <div className="balances-section">
+                  <h4 className="balances-title">Balances:</h4>
+                  {filterXLMAndUSDCBalances(dashboardGeneratedWallet.balances).map((balance: any, index: number) => (
+                    <div key={index} className="balance-item">
+                      <span className="balance-asset">
+                        {balance.asset_type === 'native' ? 'XLM' : balance.asset_code}
+                      </span>
+                      <span className="balance-amount">
+                        {parseFloat(balance.balance).toFixed(6)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="detail-item">
+                  <span className="detail-label">XLM Balance:</span>
+                  <span className="detail-value balance-value">
+                    {dashboardGeneratedWallet.balances?.find((b: any) => b.asset_type === 'native')?.balance || '0.000000'} XLM
+                  </span>
+                </div>
+              )}
+
+            </div>
+          </div>
+        ) : (
+          <div className="dashboard-card generated-wallet-card">
+            <h3 className="card-title">Generated Wallet</h3>
+            <div className="wallet-details">
               <div className="detail-item">
-                <span className="detail-label">XLM Balance:</span>
-                <span className="detail-value balance-value">
-                  {generatedWallet.balances?.find(b => b.assetType === 'native')?.balance || '0'} XLM
-                </span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Created:</span>
-                <span className="detail-value">
-                  {new Date(generatedWallet.createdAt).toLocaleDateString()}
-                </span>
+                <span className="detail-label">Status:</span>
+                <span className="detail-value">Loading...</span>
               </div>
               <div className="detail-item">
                 <button 
                   className="refresh-balance-btn"
-                  onClick={refreshGeneratedWallet}
+                  onClick={fetchGeneratedWallet}
                 >
                   <RefreshCw size={16} />
-                  Refresh Balance
+                  Load Generated Wallet
                 </button>
               </div>
             </div>

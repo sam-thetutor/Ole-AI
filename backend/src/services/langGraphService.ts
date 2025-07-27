@@ -2,6 +2,7 @@ import { HumanMessage } from "@langchain/core/messages";
 import { getBalanceTool } from "../tools/balanceTool";
 import { getWalletInfoTool } from "../tools/walletInfoTool";
 import { sendTokensTool } from "../tools/sendTokensTool";
+import { getWalletSummaryTool } from "../tools/walletSummaryTool";
 
 interface ProcessMessageResult {
   success: boolean;
@@ -31,12 +32,39 @@ class LangGraphService {
     {
       name: "send_tokens",
       description: "Send XLM tokens to another Stellar wallet address"
+    },
+    {
+      name: "get_wallet_summary",
+      description: "Get a comprehensive summary of the user's wallet including balances, transaction history, volume, and totals"
     }
   ];
 
   async processMessage(userMessage: HumanMessage, userId: string): Promise<ProcessMessageResult> {
     try {
       const messageContent = userMessage.content as string;
+      
+      // Handle wallet summary requests
+      if (messageContent.toLowerCase().includes('summary') ||
+          messageContent.toLowerCase().includes('overview') ||
+          messageContent.toLowerCase().includes('wallet summary') ||
+          messageContent.toLowerCase().includes('show summary') ||
+          messageContent.toLowerCase().includes('transaction history') ||
+          messageContent.toLowerCase().includes('wallet overview')) {
+        
+        try {
+          const summaryResult = await getWalletSummaryTool.func(userId);
+          return {
+            success: true,
+            response: summaryResult
+          };
+        } catch (error: any) {
+          console.error('Wallet summary tool error:', error);
+          return {
+            success: true,
+            response: `I couldn't fetch your wallet summary at the moment. Please make sure your wallet is connected and try again. Error: ${error.message}`
+          };
+        }
+      }
       
       // Handle send token requests
       if (messageContent.toLowerCase().includes('send') && 
@@ -152,7 +180,7 @@ class LangGraphService {
       // Default response for other messages
       return {
         success: true,
-        response: `Hello! I'm OLE AI Agent. I can help you with:\n\n• Getting the current date and time\n• Checking your Stellar wallet balance\n• Showing your wallet public key and information\n• Sending XLM tokens to other addresses\n\nTry asking me:\n• "What's the current time?"\n• "What's my wallet balance?"\n• "Show my wallet info"\n• "Send 10 XLM to GABC123..."`
+        response: `Hello! I'm OLE AI Agent. I can help you with:\n\n• Getting the current date and time\n• Checking your Stellar wallet balance\n• Showing your wallet public key and information\n• Sending XLM tokens to other addresses\n• Getting a comprehensive wallet summary with transaction history\n\nTry asking me:\n• "What's the current time?"\n• "What's my wallet balance?"\n• "Show my wallet info"\n• "Send 10 XLM to GABC123..."\n• "Show my wallet summary" or "Give me a wallet overview"`
       };
 
     } catch (error: any) {

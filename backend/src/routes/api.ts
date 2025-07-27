@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { authenticateToken } from '../middleware/auth';
 import { apiLimiter } from '../config/rateLimit';
 import userService from '../services/userService';
+import walletService from '../services/walletService';
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ router.get('/profile', authenticateToken, apiLimiter, (req: Request, res: Respon
   }
 });
 
-// Get user's generated wallet info (simplified for now)
+// Get user's generated wallet info
 router.get('/wallet', authenticateToken, apiLimiter, async (req: Request, res: Response) => {
   try {
     const { walletAddress } = req;
@@ -46,15 +47,40 @@ router.get('/wallet', authenticateToken, apiLimiter, async (req: Request, res: R
       });
     }
 
-    // For now, return a placeholder wallet response
+    // Get user's primary generated wallet
+    const generatedWallet = await walletService.getPrimaryWalletByUserId(user._id?.toString() || '');
+    
+    if (!generatedWallet) {
+      return res.status(404).json({
+        error: 'Generated wallet not found',
+        message: 'No generated wallet found for this user'
+      });
+    }
+
+    // Get current balances from Stellar network
+    const allBalances = await walletService.getWalletBalanceFromStellar(generatedWallet.publicKey);
+    
+    // Filter to only show XLM and USDC balances
+    const filteredBalances = allBalances.filter(balance => {
+      // Include XLM (native asset)
+      if (balance.asset_type === 'native') {
+        return true;
+      }
+      // Include USDC
+      if (balance.asset_code === 'USDC') {
+        return true;
+      }
+      return false;
+    });
+
     res.status(200).json({
       success: true,
       data: {
-        publicKey: walletAddress,
-        network: 'testnet',
-        balances: [],
-        createdAt: user.createdAt,
-        lastBalanceCheck: new Date().toISOString()
+        publicKey: generatedWallet.publicKey,
+        network: generatedWallet.network,
+        balances: filteredBalances,
+        createdAt: generatedWallet.createdAt,
+        lastBalanceCheck: generatedWallet.lastBalanceCheck
       }
     });
   } catch (error: any) {
@@ -66,7 +92,7 @@ router.get('/wallet', authenticateToken, apiLimiter, async (req: Request, res: R
   }
 });
 
-// Refresh wallet balances (simplified for now)
+// Refresh wallet balances
 router.post('/wallet/refresh-balances', authenticateToken, apiLimiter, async (req: Request, res: Response) => {
   try {
     const { walletAddress } = req;
@@ -87,15 +113,43 @@ router.post('/wallet/refresh-balances', authenticateToken, apiLimiter, async (re
       });
     }
 
-    // For now, return a placeholder response
+    // Get user's primary generated wallet
+    const generatedWallet = await walletService.getPrimaryWalletByUserId(user._id?.toString() || '');
+    
+    if (!generatedWallet) {
+      return res.status(404).json({
+        error: 'Generated wallet not found',
+        message: 'No generated wallet found for this user'
+      });
+    }
+
+    // Get fresh balances from Stellar network
+    const allBalances = await walletService.getWalletBalanceFromStellar(generatedWallet.publicKey);
+    
+    // Filter to only show XLM and USDC balances
+    const filteredBalances = allBalances.filter(balance => {
+      // Include XLM (native asset)
+      if (balance.asset_type === 'native') {
+        return true;
+      }
+      // Include USDC
+      if (balance.asset_code === 'USDC') {
+        return true;
+      }
+      return false;
+    });
+    
+    // Update the wallet's last balance check time (store all balances in DB, but return filtered)
+    await walletService.updateWalletBalances(generatedWallet._id, allBalances);
+
     res.status(200).json({
       success: true,
       data: {
-        publicKey: walletAddress,
-        network: 'testnet',
-        balances: [],
-        createdAt: user.createdAt,
-        lastBalanceCheck: new Date().toISOString()
+        publicKey: generatedWallet.publicKey,
+        network: generatedWallet.network,
+        balances: filteredBalances,
+        createdAt: generatedWallet.createdAt,
+        lastBalanceCheck: new Date()
       }
     });
   } catch (error: any) {
