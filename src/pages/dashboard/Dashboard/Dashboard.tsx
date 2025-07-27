@@ -8,10 +8,16 @@ interface Transaction {
   id: string;
   type: string;
   amount: string;
-  asset: string;
-  from: string;
-  to: string;
+  asset?: string;
+  from?: string;
+  to?: string;
   timestamp: string;
+  hash?: string;
+  memo?: string;
+  fee?: string;
+  successful?: boolean;
+  ledger?: number;
+  operation_count?: number;
 }
 
 interface WalletBalance {
@@ -79,20 +85,28 @@ const Dashboard: React.FC = () => {
     }
   }, [generatedWallet]);
 
+  // Automatically fetch transaction history when dashboardGeneratedWallet changes
+  useEffect(() => {
+    if (dashboardGeneratedWallet?.publicKey) {
+      console.log('Dashboard generated wallet changed, fetching transaction history...');
+      fetchTransactionHistory();
+    }
+  }, [dashboardGeneratedWallet]);
+
   const loadDashboardData = async () => {
     if (!publicKey) return;
     
     try {
       setLoading(true);
-      // For now, we'll use empty transactions since we removed the fetchRecentPayments
-      // You can implement this functionality later if needed
-      setRecentTransactions([]);
       
       // Fetch generated wallet from backend
       await fetchGeneratedWallet();
       
       // Refresh generated wallet to get latest balances
       await refreshGeneratedWallet();
+      
+      // Fetch transaction history
+      await fetchTransactionHistory();
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -131,11 +145,139 @@ const Dashboard: React.FC = () => {
       if (response.success && response.data) {
         setDashboardGeneratedWallet(response.data);
         console.log('Generated wallet set in dashboard:', response.data);
+        
+        // Automatically fetch transaction history when wallet is loaded
+        await fetchTransactionHistory();
       } else {
         console.error('Failed to fetch generated wallet:', response);
       }
     } catch (error) {
       console.error('Error fetching generated wallet:', error);
+    }
+  };
+
+  const fetchTransactionHistory = async () => {
+    if (!dashboardGeneratedWallet?.publicKey) {
+      console.log('No generated wallet available for transaction history');
+      return;
+    }
+
+    try {
+      console.log('Fetching transaction history for:', dashboardGeneratedWallet.publicKey);
+
+      // Fetch directly from Stellar Horizon API
+      const network = 'testnet'; // You can make this configurable
+      const horizonUrl = network === 'testnet' 
+        ? 'https://horizon-testnet.stellar.org' 
+        : 'https://horizon.stellar.org';
+      
+      const response = await fetch(
+        `${horizonUrl}/accounts/${dashboardGeneratedWallet.publicKey}/transactions?limit=20&order=desc`
+      );
+
+      console.log("transaction husotyr",response);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Raw transaction data:', data);
+
+      if (data._embedded && data._embedded.records) {
+        // Process transactions to get operation details
+        const processedTransactions = await Promise.all(
+          data._embedded.records.map(async (tx: any) => {
+            try {
+              // Fetch operations for this transaction
+              const operationsResponse = await fetch(
+                `${horizonUrl}/transactions/${tx.hash}/operations`
+              );
+              
+              if (operationsResponse.ok) {
+                const operationsData = await operationsResponse.json();
+                const firstOp = operationsData._embedded?.records?.[0];
+                
+                let type = 'payment';
+                let amount = '0.000000';
+                let asset = 'XLM';
+                let to = 'Unknown';
+                
+                if (firstOp) {
+                  type = firstOp.type;
+                  if (firstOp.type === 'payment') {
+                    amount = firstOp.amount || '0.000000';
+                    asset = firstOp.asset_type === 'native' ? 'XLM' : (firstOp.asset_code || 'XLM');
+                    to = firstOp.to || 'Unknown';
+                  }
+                }
+                
+                return {
+                  id: tx.hash,
+                  type: type,
+                  amount: amount,
+                  asset: asset,
+                  from: tx.source_account,
+                  to: to,
+                  timestamp: tx.created_at,
+                  hash: tx.hash,
+                  memo: tx.memo,
+                  fee: tx.fee_paid,
+                  successful: tx.successful,
+                  ledger: tx.ledger,
+                  operation_count: tx.operation_count
+                };
+              } else {
+                // Fallback if operations fetch fails
+                return {
+                  id: tx.hash,
+                  type: 'payment',
+                  amount: '0.000000',
+                  asset: 'XLM',
+                  from: tx.source_account,
+                  to: 'Unknown',
+                  timestamp: tx.created_at,
+                  hash: tx.hash,
+                  memo: tx.memo,
+                  fee: tx.fee_paid,
+                  successful: tx.successful,
+                  ledger: tx.ledger,
+                  operation_count: tx.operation_count
+                };
+              }
+            } catch (opError) {
+              console.error('Error fetching operations for transaction:', opError);
+              // Return basic transaction data if operations fetch fails
+              return {
+                id: tx.hash,
+                type: 'payment',
+                amount: '0.000000',
+                asset: 'XLM',
+                from: tx.source_account,
+                to: 'Unknown',
+                timestamp: tx.created_at,
+                hash: tx.hash,
+                memo: tx.memo,
+                fee: tx.fee_paid,
+                successful: tx.successful,
+                ledger: tx.ledger,
+                operation_count: tx.operation_count
+              };
+            }
+          })
+        );
+
+        setRecentTransactions(processedTransactions as Transaction[]);
+        console.log('Transaction history loaded:', processedTransactions);
+        console.log('Number of transactions:', processedTransactions.length);
+        console.log('First transaction:', processedTransactions[0]);
+      } else {
+        console.log('No transactions found');
+        setRecentTransactions([]);
+      }
+    } catch (error) {
+      console.error('Error fetching transaction history:', error);
+      setRecentTransactions([]);
     }
   };
 
@@ -227,6 +369,14 @@ const Dashboard: React.FC = () => {
                   </span>
                 </div>
               )}
+              
+              {/* Transaction Count Display */}
+              <div className="detail-item">
+                <span className="detail-label">Recent Transactions:</span>
+                <span className="detail-value">
+                  {recentTransactions.length} transactions loaded
+                </span>
+              </div>
 
             </div>
           </div>
@@ -326,14 +476,21 @@ const Dashboard: React.FC = () => {
                   <div className="transaction-details">
                     <div className="transaction-type">{tx.type}</div>
                     <div className="transaction-amount">
-                      {tx.amount} {tx.asset}
+                      {tx.amount} {tx.asset || 'XLM'}
                     </div>
                   </div>
                   <div className="transaction-meta">
-                    <div className="transaction-date">{tx.timestamp}</div>
-                    <div className="transaction-address">
-                      {formatAddress(tx.to)}
+                    <div className="transaction-date">
+                      {new Date(tx.timestamp).toLocaleDateString()}
                     </div>
+                    <div className="transaction-address">
+                      {formatAddress(tx.to || 'Unknown')}
+                    </div>
+                    {tx.ledger && (
+                      <div className="transaction-ledger">
+                        Ledger: {tx.ledger}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

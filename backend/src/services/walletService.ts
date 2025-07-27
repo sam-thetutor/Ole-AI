@@ -3,6 +3,9 @@ import Wallet from '../models/Wallet';
 import WalletBalance from '../models/WalletBalance';
 import crypto from 'crypto';
 
+import dotenv from 'dotenv';
+dotenv.config();
+
 interface IWallet {
   _id: string;
   userId: string;
@@ -237,6 +240,69 @@ class WalletService {
     } catch (error) {
       console.error('Error getting wallet with balances:', error);
       throw error;
+    }
+  }
+
+  // Get transaction history from Stellar Horizon API
+  async getTransactionHistory(publicKey: string): Promise<any[]> {
+    try {
+      console.log(`Fetching transaction history for wallet: ${publicKey}`);
+      
+      console.log(publicKey);
+      // Use the Stellar SDK server to get transactions
+      const transactions = await this.server.transactions()
+      
+        .forAccount(publicKey)
+        .order('desc')
+        .limit(20)
+        .call();
+      
+      // Process and format transactions
+      const formattedTransactions = await Promise.all(transactions.records.map(async (tx: any) => {
+        // Get operations for this transaction to extract details
+        const operations = await this.server.operations()
+          .forTransaction(tx.hash)
+          .call();
+        
+        // Extract operation details
+        const firstOp = operations.records[0];
+        let type = 'payment';
+        let amount = '0.000000';
+        let asset = 'XLM';
+        let to = 'Unknown';
+        
+        if (firstOp) {
+          type = firstOp.type;
+          if (firstOp.type === 'payment') {
+            amount = firstOp.amount || '0.000000';
+            asset = firstOp.asset_type === 'native' ? 'XLM' : (firstOp.asset_code || 'XLM');
+            to = firstOp.to || 'Unknown';
+          }
+        }
+        
+        return {
+          id: tx.hash,
+          type: type,
+          amount: amount,
+          asset: asset,
+          from: tx.source_account,
+          to: to,
+          timestamp: tx.created_at,
+          hash: tx.hash,
+          memo: tx.memo,
+          fee: tx.fee_paid,
+          successful: tx.successful,
+          ledger: tx.ledger,
+          operation_count: tx.operation_count
+        };
+      }));
+      
+      return formattedTransactions;
+    } catch (error: any) {
+      console.error('Error fetching transaction history from Stellar Horizon:', error);
+      
+      // Return empty array on error
+      return [];
     }
   }
 

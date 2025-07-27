@@ -1,5 +1,5 @@
- //const API_BASE_URL = 'https://ole-be-production.up.railway.app/api';
-const API_BASE_URL = 'http://localhost:3001/api';
+ const API_BASE_URL = 'https://ole-be-production.up.railway.app/api';
+//const API_BASE_URL = 'http://localhost:3001/api';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -253,6 +253,10 @@ class ApiService {
 
   async getTransactions(limit: number = 10, offset: number = 0): Promise<ApiResponse<TransactionResponse>> {
     return await this.request<TransactionResponse>(`/wallet/transactions?limit=${limit}&offset=${offset}`);
+  }
+
+  async getTransactionHistory(): Promise<ApiResponse<{ transactions: Transaction[]; walletAddress: string }>> {
+    return await this.request<{ transactions: Transaction[]; walletAddress: string }>('/wallet/transactions');
   }
 
   async sendPayment(toAddress: string, amount: string, asset: string = 'XLM', memo: string = ''): Promise<ApiResponse<any>> {

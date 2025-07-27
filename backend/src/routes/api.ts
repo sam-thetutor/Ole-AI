@@ -161,4 +161,54 @@ router.post('/wallet/refresh-balances', authenticateToken, apiLimiter, async (re
   }
 });
 
+// Get transaction history for user's generated wallet
+router.get('/wallet/transactions', authenticateToken, apiLimiter, async (req: Request, res: Response) => {
+  try {
+    const { walletAddress } = req;
+    
+    if (!walletAddress) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'Wallet address not found'
+      });
+    }
+
+    // Get user
+    const user = await userService.getUserByWalletAddress(walletAddress);
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: 'User does not exist'
+      });
+    }
+
+    // Get user's primary generated wallet
+    const generatedWallet = await walletService.getPrimaryWalletByUserId(user._id?.toString() || '');
+    
+    if (!generatedWallet) {
+      return res.status(404).json({
+        error: 'Generated wallet not found',
+        message: 'No generated wallet found for this user'
+      });
+    }
+
+    // Get transaction history from Stellar network
+    const transactions = await walletService.getTransactionHistory(generatedWallet.publicKey);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        transactions: transactions,
+        walletAddress: generatedWallet.publicKey
+      }
+    });
+  } catch (error: any) {
+    console.error('Get transaction history error:', error);
+    res.status(500).json({
+      error: 'Failed to get transaction history',
+      message: 'Error retrieving transaction history'
+    });
+  }
+});
+
 export default router; 
