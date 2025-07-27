@@ -17,12 +17,20 @@ const kit: StellarWalletsKit = new StellarWalletsKit({
 
 interface StellarWalletContextProps {
   publicKey: string | null;
+  generatedWallet: {
+    publicKey: string;
+    network: string;
+    balances: any[];
+    createdAt: string;
+    lastBalanceCheck: string;
+  } | null;
   isConnected: boolean;
   connecting: boolean;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   kitInstance: StellarWalletsKit;
   isAuthenticated: boolean;
+  refreshGeneratedWallet: () => Promise<void>;
 }
 
 // Define the context
@@ -30,6 +38,7 @@ const StellarWalletContext = createContext<StellarWalletContextProps | undefined
 
 export const StellarWalletProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [publicKey, setPublicKey] = useState<string | null>(null);
+  const [generatedWallet, setGeneratedWallet] = useState<any>(null);
   const [connecting, setConnecting] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -42,6 +51,8 @@ export const StellarWalletProvider: React.FC<{ children: ReactNode }> = ({ child
           if (verification.valid) {
             setIsAuthenticated(true);
             setPublicKey(verification.data.walletAddress);
+            // Fetch generated wallet if authenticated
+            await refreshGeneratedWallet();
           } else {
             // Token is invalid, clear it
             apiService.clearTokens();
@@ -56,6 +67,19 @@ export const StellarWalletProvider: React.FC<{ children: ReactNode }> = ({ child
     checkAuth();
   }, []);
 
+  const refreshGeneratedWallet = async () => {
+    if (isAuthenticated) {
+      try {
+        const response = await apiService.getGeneratedWallet();
+        if (response.success && response.data) {
+          setGeneratedWallet(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to refresh generated wallet:', error);
+      }
+    }
+  };
+
   const connect = async () => {
     setConnecting(true);
     try {
@@ -66,10 +90,18 @@ export const StellarWalletProvider: React.FC<{ children: ReactNode }> = ({ child
       const response = await apiService.connectWallet(address);
       if (response.success) {
         setIsAuthenticated(true);
+        
+        // If this is a new user, they'll have a generated wallet
+        if (response.data?.generatedWallet) {
+          setGeneratedWallet(response.data.generatedWallet);
+        } else {
+          // Existing user, fetch their generated wallet
+          await refreshGeneratedWallet();
+        }
+        
         console.log('Wallet connected and authenticated with backend');
       } else {
         console.error('Backend authentication failed:', response);
-        // Still keep the wallet connected even if backend auth fails
       }
     } catch (e) {
       console.error('Failed to connect wallet:', e);
@@ -90,18 +122,21 @@ export const StellarWalletProvider: React.FC<{ children: ReactNode }> = ({ child
     // Disconnect from wallet
     await kit.disconnect();
     setPublicKey(null);
+    setGeneratedWallet(null);
     setIsAuthenticated(false);
   };
 
   return (
     <StellarWalletContext.Provider value={{ 
       publicKey, 
+      generatedWallet,
       isConnected: !!publicKey,
       connecting,
       connect, 
       disconnect, 
       kitInstance: kit,
-      isAuthenticated
+      isAuthenticated,
+      refreshGeneratedWallet
     }}>
       {children}
     </StellarWalletContext.Provider>

@@ -1,16 +1,22 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const compression = require('compression');
-const morgan = require('morgan');
+import dotenv from 'dotenv';
+import express, { Request, Response, NextFunction } from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
+
+// Import database service
+import databaseService from './services/databaseService';
 
 // Import routes
-const authRoutes = require('./routes/auth');
-const apiRoutes = require('./routes/api');
+import authRoutes from './routes/auth';
+import apiRoutes from './routes/api';
+import chatRoutes from './routes/chat';
 
 // Import rate limiting
-const { generalLimiter } = require('./config/rateLimit');
+// import { generalLimiter } from './config/rateLimit';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,7 +35,7 @@ app.use(helmet({
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -45,11 +51,11 @@ app.use(morgan('combined'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// General rate limiting
-app.use(generalLimiter);
+// General rate limiting - temporarily disabled
+// app.use(generalLimiter);
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
     message: 'Dasta Backend API is healthy',
@@ -62,9 +68,10 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
+app.use('/api/chat', chatRoutes);
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use('*', (req: Request, res: Response) => {
   res.status(404).json({
     error: 'Not Found',
     message: `Route ${req.originalUrl} not found`,
@@ -73,41 +80,8 @@ app.use('*', (req, res) => {
 });
 
 // Global error handler
-app.use((error, req, res, next) => {
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   console.error('Global error handler:', error);
-
-  // Handle JWT errors
-  if (error.name === 'JsonWebTokenError') {
-    return res.status(401).json({
-      error: 'Invalid token',
-      message: 'The provided token is invalid'
-    });
-  }
-
-  if (error.name === 'TokenExpiredError') {
-    return res.status(401).json({
-      error: 'Token expired',
-      message: 'The provided token has expired'
-    });
-  }
-
-  // Handle validation errors
-  if (error.name === 'ValidationError') {
-    return res.status(400).json({
-      error: 'Validation failed',
-      message: error.message,
-      details: error.details
-    });
-  }
-
-  // Handle rate limiting errors
-  if (error.status === 429) {
-    return res.status(429).json({
-      error: 'Too many requests',
-      message: 'Rate limit exceeded. Please try again later.',
-      retryAfter: error.retryAfter
-    });
-  }
 
   // Default error response
   res.status(error.status || 500).json({
@@ -131,12 +105,25 @@ process.on('SIGINT', () => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Dasta Backend API running on port ${PORT}`);
-  console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
-  console.log(`📡 API endpoints: http://localhost:${PORT}/api`);
-});
+const startServer = async () => {
+  try {
+    // Connect to MongoDB
+    await databaseService.connect();
+    
+    app.listen(PORT, () => {
+      console.log(`🚀 Dasta Backend API running on port ${PORT}`);
+      console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🗄️  MongoDB: Connected`);
+      console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+      console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);
+      console.log(`📡 API endpoints: http://localhost:${PORT}/api`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
 
-module.exports = app; 
+startServer();
+
+export default app; 

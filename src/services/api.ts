@@ -1,5 +1,5 @@
-const API_BASE_URL = 'https://ole-backend-production.up.railway.app/api';
-// const API_BASE_URL = 'http://localhost:3001/api';
+ const API_BASE_URL = 'https://ole-backend-production.up.railway.app/api';
+//const API_BASE_URL = 'http://localhost:3001/api';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -10,10 +10,24 @@ interface ApiResponse<T = any> {
 
 interface TokenData {
   walletAddress: string;
+  generatedWallet?: {
+    publicKey: string;
+    network: string;
+    createdAt: string;
+  };
+  isNewUser?: boolean;
   accessToken: string;
   refreshToken: string;
   expiresIn: string;
   refreshExpiresIn: string;
+}
+
+interface WalletData {
+  publicKey: string;
+  network: string;
+  balances: any[];
+  createdAt: string;
+  lastBalanceCheck: string;
 }
 
 interface WalletBalance {
@@ -60,6 +74,31 @@ interface LeaderboardResponse {
   type: string;
   leaderboard: LeaderboardEntry[];
   lastUpdated: string;
+}
+
+interface ChatMessage {
+  id: string;
+  text: string;
+  sender: 'user' | 'ai';
+  timestamp: string;
+  data?: any;
+}
+
+interface ChatResponse {
+  response: string;
+  timestamp: string;
+  userId: string;
+}
+
+interface ChatTool {
+  name: string;
+  description: string;
+  parameters?: any;
+}
+
+interface ChatToolsResponse {
+  tools: ChatTool[];
+  count: number;
 }
 
 class ApiService {
@@ -215,8 +254,14 @@ class ApiService {
     return await this.request<{ walletAddress: string; connectedAt: string }>('/profile');
   }
 
-  async getWalletBalance(): Promise<ApiResponse<WalletBalance>> {
-    return await this.request<WalletBalance>('/wallet/balance');
+  async getGeneratedWallet(): Promise<ApiResponse<WalletData>> {
+    return await this.request<WalletData>('/wallet');
+  }
+
+  async refreshWalletBalances(): Promise<ApiResponse<WalletData>> {
+    return await this.request<WalletData>('/wallet/refresh-balances', {
+      method: 'POST',
+    });
   }
 
   async getTransactions(limit: number = 10, offset: number = 0): Promise<ApiResponse<TransactionResponse>> {
@@ -256,6 +301,22 @@ class ApiService {
   // Check if user is authenticated
   isAuthenticated(): boolean {
     return !!this.accessToken;
+  }
+
+  // Chat methods
+  async sendChatMessage(message: string): Promise<ApiResponse<ChatResponse>> {
+    return await this.request<ChatResponse>('/chat/send', {
+      method: 'POST',
+      body: JSON.stringify({ message }),
+    });
+  }
+
+  async getChatTools(): Promise<ApiResponse<ChatToolsResponse>> {
+    return await this.request<ChatToolsResponse>('/chat/tools');
+  }
+
+  async checkChatHealth(): Promise<ApiResponse<{ message: string; timestamp: string; availableTools: number }>> {
+    return await this.request<{ message: string; timestamp: string; availableTools: number }>('/chat/health');
   }
 }
 

@@ -27,7 +27,7 @@ interface LeaderboardEntry {
 type DashboardSection = 'wallet' | 'transactions' | 'leaderboard';
 
 const Dashboard: React.FC = () => {
-  const { publicKey } = useStellarWallet();
+  const { publicKey, generatedWallet, refreshGeneratedWallet } = useStellarWallet();
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<DashboardSection>('wallet');
@@ -106,17 +106,13 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="dashboard-grid">
-        {/* Wallet Info Card */}
+        {/* Connected Wallet Info Card */}
         <div className="dashboard-card wallet-info-card">
-          <h3 className="card-title">Wallet Information</h3>
+          <h3 className="card-title">Connected Wallet</h3>
           <div className="wallet-details">
             <div className="detail-item">
               <span className="detail-label">Public Key:</span>
               <span className="detail-value">{formatAddress(publicKey || '')}</span>
-            </div>
-            <div className="detail-item">
-              <span className="detail-label">Balance:</span>
-              <span className="detail-value balance-value">N/A</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Status:</span>
@@ -124,6 +120,44 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Generated Wallet Info Card */}
+        {generatedWallet && (
+          <div className="dashboard-card generated-wallet-card">
+            <h3 className="card-title">Generated Wallet</h3>
+            <div className="wallet-details">
+              <div className="detail-item">
+                <span className="detail-label">Public Key:</span>
+                <span className="detail-value">{formatAddress(generatedWallet.publicKey)}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Network:</span>
+                <span className="detail-value">{generatedWallet.network}</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">XLM Balance:</span>
+                <span className="detail-value balance-value">
+                  {generatedWallet.balances?.find(b => b.assetType === 'native')?.balance || '0'} XLM
+                </span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Created:</span>
+                <span className="detail-value">
+                  {new Date(generatedWallet.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="detail-item">
+                <button 
+                  className="refresh-balance-btn"
+                  onClick={refreshGeneratedWallet}
+                >
+                  <RefreshCw size={16} />
+                  Refresh Balance
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Quick Actions Card */}
         <div className="dashboard-card quick-actions-card">

@@ -1,24 +1,25 @@
-const { body, param, validationResult } = require('express-validator');
+import { Request, Response, NextFunction } from 'express';
+import { body, param, validationResult } from 'express-validator';
 
 // Stellar wallet address validation
-const isValidStellarAddress = (address) => {
+const isValidStellarAddress = (address: string): boolean => {
   // Stellar addresses are 56 characters long and start with G, M, or T
   const stellarAddressRegex = /^[G-M][A-Z2-7]{55}$/;
   return stellarAddressRegex.test(address);
 };
 
 // Validation middleware
-const handleValidationErrors = (req, res, next) => {
+const handleValidationErrors = (req: Request, res: Response, next: NextFunction): void => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({
+    res.status(400).json({
       error: 'Validation failed',
       details: errors.array().map(err => ({
-        field: err.path,
-        message: err.msg,
-        value: err.value
+        field: err.type,
+        message: err.msg
       }))
     });
+    return;
   }
   next();
 };
@@ -83,7 +84,7 @@ const validateTokenRequest = [
   handleValidationErrors
 ];
 
-module.exports = {
+export {
   isValidStellarAddress,
   handleValidationErrors,
   validateWalletAddress,
