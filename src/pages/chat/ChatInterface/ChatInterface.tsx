@@ -17,7 +17,7 @@ const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: '**Hello! I\'m your Stellar AI Agent.** 🤖\n\nConnect your wallet to start managing your blockchain assets with natural language prompts.\n\nI can help you with:\n• **Getting the current date and time**\n• **Checking your Stellar wallet balance**\n• **Showing your wallet public key and information**\n• **Sending XLM tokens to other addresses**\n\nTry asking me:\n• "What\'s the current time?"\n• "What\'s my wallet balance?"\n• "Show my wallet info"\n• "Send 10 XLM to GABC123..."',
+      text: '👋 Hello! I\'m your Personalized AI Agent. How can I help you today?',
       sender: 'ai',
       timestamp: new Date()
     }

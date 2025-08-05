@@ -96,6 +96,27 @@
   box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
 }
 
+/* Chat button in navbar */
+.chat-button-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.chat-button-nav:hover {
+  background: rgba(0, 255, 136, 0.1);
+  transform: translateY(-1px);
+}
+
+.chat-button-nav:active {
+  transform: translateY(0);
+}
+
 .brand-link {
   text-decoration: none;
   color: inherit;

@@ -1,13 +1,15 @@
 import express, { Request, Response } from 'express';
 import { HumanMessage } from '@langchain/core/messages';
 import langGraphService from '../services/langGraphService';
-import { chatAuth, chatRateLimit } from '../middleware/chatAuth';
+import { chatRateLimit } from '../middleware/chatAuth';
+import { authenticateToken } from '../middleware/auth';
 import userService from '../services/userService';
+import metricsService from '../services/metricsService';
 
 const router = express.Router();
 
 // Send a message to the AI agent (with authentication)
-router.post('/send', chatAuth, chatRateLimit, async (req: Request, res: Response) => {
+router.post('/send', authenticateToken, chatRateLimit, async (req: Request, res: Response) => {
   try {
     const { message } = req.body;
     const walletAddress = req.walletAddress; // Use authenticated wallet address
@@ -47,6 +49,12 @@ router.post('/send', chatAuth, chatRateLimit, async (req: Request, res: Response
     // Create human message for LangGraph
     const humanMessage = new HumanMessage(message.trim());
 
+    // Track the prompt metric
+    await metricsService.trackPrompt(userId, walletAddress, {
+      messageLength: message.trim().length,
+      timestamp: new Date().toISOString()
+    });
+
     // Process message through LangGraph
     const result = await langGraphService.processMessage(humanMessage, userId);
 
@@ -77,7 +85,7 @@ router.post('/send', chatAuth, chatRateLimit, async (req: Request, res: Response
 });
 
 // Get available tools (with authentication)
-router.get('/tools', chatAuth, async (req: Request, res: Response) => {
+router.get('/tools', authenticateToken, async (req: Request, res: Response) => {
   try {
     const tools = langGraphService.getAvailableTools();
     
@@ -93,6 +101,38 @@ router.get('/tools', chatAuth, async (req: Request, res: Response) => {
     res.status(500).json({
       error: 'Failed to get tools',
       message: 'Failed to retrieve available tools'
+    });
+  }
+});
+
+// Change LLM provider (admin only - with authentication)
+router.post('/llm-provider', authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const { provider } = req.body;
+    
+    if (!provider || typeof provider !== 'string') {
+      return res.status(400).json({
+        error: 'Invalid provider',
+        message: 'Please provide a valid LLM provider'
+      });
+    }
+
+    // Change the LLM provider
+    langGraphService.setLLMProvider(provider);
+    
+    res.status(200).json({
+      success: true,
+      message: `LLM provider changed to ${provider}`,
+      data: {
+        provider,
+        timestamp: new Date().toISOString()
+      }
+    });
+  } catch (error: any) {
+    console.error('Change LLM provider error:', error);
+    res.status(500).json({
+      error: 'Failed to change LLM provider',
+      message: error.message
     });
   }
 });

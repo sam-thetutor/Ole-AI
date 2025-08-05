@@ -1,0 +1,53 @@
+/* Chat Modal Styles */
+.chat-modal-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Override chat container styles for modal */
+.chat-modal-content .chat-container {
+  height: 100%;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  max-width: none;
+}
+
+/* Ensure chat messages take full height */
+.chat-modal-content .chat-messages {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .chat-modal-content .chat-container {
+    height: 100%;
+  }
+  
+  .chat-modal-content .chat-messages {
+    padding: 1rem;
+  }
+  
+  .chat-modal-content .chat-input-container {
+    padding: 1rem;
+  }
+}
+
+/* Large screen adjustments for narrower modal */
+@media (min-width: 769px) {
+  .chat-modal-content .chat-messages {
+    padding: 1.25rem;
+  }
+  
+  .chat-modal-content .chat-input-container {
+    padding: 1.25rem;
+  }
+  
+  .chat-modal-content .message-content {
+    max-width: 85%;
+  }
+} 

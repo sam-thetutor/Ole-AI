@@ -1,6 +1,7 @@
 import React from 'react';
 import { MessageSquare, BarChart3, RefreshCw, TrendingUp, Rocket, Zap, Shield, Globe, Users, Target } from 'lucide-react';
 import logoImage from '../../../assets/logo.png';
+import MetricsDisplay from '../../../components/common/MetricsDisplay/MetricsDisplay';
 import './Homepage.css';
 
 const Homepage: React.FC = () => {
@@ -61,6 +62,8 @@ const Homepage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <MetricsDisplay />
 
       <div className="features-section">
         <h2 className="section-title">What You Can Do</h2>

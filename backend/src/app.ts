@@ -5,6 +5,26 @@ import helmet from 'helmet';
 import compression from 'compression';
 import morgan from 'morgan';
 
+// Import configuration
+import { config, logConfiguration } from './config/environment';
+
+// Helper function to get LLM model info
+const getLlmModelInfo = (): string => {
+  const provider = config.defaultLlmProvider;
+  switch (provider) {
+    case 'groq':
+      return `${config.groqModel} (Groq)`;
+    case 'openai':
+      return `${config.openaiModel} (OpenAI)`;
+    case 'anthropic':
+      return `${config.anthropicModel} (Anthropic)`;
+    case 'ollama':
+      return `${config.ollamaModel} (Ollama)`;
+    default:
+      return `${config.groqModel} (Groq)`;
+  }
+};
+
 // Import database service
 import databaseService from './services/databaseService';
 
@@ -13,6 +33,9 @@ import authRoutes from './routes/auth';
 import apiRoutes from './routes/api';
 import chatRoutes from './routes/chat';
 import paymentLinkRoutes from './routes/paymentLinks';
+import fundingRoutes from './routes/funding';
+import tokenTransferRoutes from './routes/tokenTransfer';
+import metricsRoutes from './routes/metrics';
 
 // Import rate limiting
 // import { generalLimiter } from './config/rateLimit';
@@ -20,7 +43,7 @@ import paymentLinkRoutes from './routes/paymentLinks';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = config.port;
 
 // Security middleware
 app.use(helmet({
@@ -36,7 +59,7 @@ app.use(helmet({
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175','https://dasta-chi.vercel.app'],
+  origin: config.corsOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
@@ -62,7 +85,11 @@ app.get('/health', (req: Request, res: Response) => {
     message: 'Dasta Backend API is healthy',
     timestamp: new Date().toISOString(),
     version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development'
+    environment: config.nodeEnv,
+    stellarNetwork: config.stellarNetwork,
+    frontendUrl: config.frontendUrl,
+    llmProvider: config.defaultLlmProvider,
+    llmModel: getLlmModelInfo()
   });
 });
 
@@ -71,6 +98,9 @@ app.use('/api/auth', authRoutes);
 app.use('/api', apiRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/payment-links', paymentLinkRoutes);
+app.use('/api/funding', fundingRoutes);
+app.use('/api/transfer', tokenTransferRoutes);
+app.use('/api/metrics', metricsRoutes);
 
 // 404 handler
 app.use('*', (req: Request, res: Response) => {
@@ -88,7 +118,7 @@ app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   // Default error response
   res.status(error.status || 500).json({
     error: 'Internal server error',
-    message: process.env.NODE_ENV === 'production' 
+    message: config.nodeEnv === 'production' 
       ? 'Something went wrong' 
       : error.message,
     timestamp: new Date().toISOString()
@@ -109,12 +139,14 @@ process.on('SIGINT', () => {
 // Start server
 const startServer = async () => {
   try {
+    // Log configuration
+    logConfiguration();
+    
     // Connect to MongoDB
     await databaseService.connect();
     
     app.listen(PORT, () => {
       console.log(`🚀 Dasta Backend API running on port ${PORT}`);
-      console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🗄️  MongoDB: Connected`);
       console.log(`🔗 Health check: http://localhost:${PORT}/health`);
       console.log(`🔐 Auth endpoints: http://localhost:${PORT}/api/auth`);

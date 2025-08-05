@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext'
-import { Menu, X, ChevronDown, Copy, Check, Wallet } from 'lucide-react'
+import { useChatModal } from '../../../contexts/ChatModalContext/ChatModalContext'
+import { Menu, X, ChevronDown, Copy, Check, Wallet, MessageCircle } from 'lucide-react'
 import ConnectButton from '../../common/Button/ConnectButton'
 import './Navbar.css'
 import logo from '../../../assets/logo.png'
 
 const Navbar: React.FC = () => {
   const { publicKey, connect, disconnect } = useStellarWallet()
+  const { openChatModal } = useChatModal()
   const location = useLocation()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -108,12 +110,13 @@ const Navbar: React.FC = () => {
             >
               Dashboard
             </Link>
-            <Link 
-              to="/chat" 
-              className={`nav-link ${isActive('/chat') ? 'active' : ''}`}
+            <button 
+              className="nav-link chat-button-nav"
+              onClick={openChatModal}
             >
-              AI Chat
-            </Link>
+              <MessageCircle size={16} />
+              Ole
+            </button>
             
             <div className="wallet-dropdown" ref={dropdownRef}>
               <button 
@@ -167,13 +170,16 @@ const Navbar: React.FC = () => {
             >
               Dashboard
             </Link>
-            <Link 
-              to="/chat" 
-              className={`mobile-nav-link ${isActive('/chat') ? 'active' : ''}`}
-              onClick={() => setIsMobileMenuOpen(false)}
+            <button 
+              className="mobile-nav-link chat-button-nav"
+              onClick={() => {
+                openChatModal()
+                setIsMobileMenuOpen(false)
+              }}
             >
-              AI Chat
-            </Link>
+              <MessageCircle size={16} />
+              Ole
+            </button>
             
             <div className="mobile-wallet-info">
               <div className="mobile-wallet-header">

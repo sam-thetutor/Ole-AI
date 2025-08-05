@@ -1,41 +1,57 @@
-# Ole AI Agent
+# Dasta
 
-![Ole Interface](./src/assets/hero.png)
+A comprehensive payment platform built with React, Node.js, and Soroban smart contracts.
 
-## Overview
-Ole is an intelligent, conversational assistant for blockchain financial management. It enables users to perform all major blockchain actions—such as sending and receiving tokens, creating payment links, checking balances, swapping assets, managing investments, and automating recurring tasks—using simple natural language prompts. The agent acts as a unified interface, automating complex workflows and providing personalized financial assistance based on user preferences and risk tolerance.
+## Documentation
 
-## Problem Statement
-Navigating blockchain networks and ecosystems is often a fragmented and overwhelming experience for users. To perform basic and advanced financial actions—such as sending or receiving tokens, investing, or creating payment links—users are forced to jump between multiple platforms, each with its own interface and requirements. This means:
+All documentation has been organized in the `docs/` folder:
 
-- **Platform Fragmentation**: Users must find and use different platforms for each task (wallet management, payments, trading, investing, etc.), leading to a disjointed experience.
-- **Wallet Hassles**: Every time a user visits a new platform, they must create or connect their wallet again, repeating onboarding steps and exposing themselves to potential security risks.
-- **Steep Learning Curve**: Each blockchain network and platform introduces new concepts, terminology, and workflows that users must learn before they can confidently interact with the ecosystem.
-- **Missed Opportunities**: Users often miss out on market trends, investment opportunities, or timely actions simply because they are busy or unable to monitor the ecosystem constantly.
-- **Repetitive Manual Tasks**: Routine actions—like buying tokens daily or setting up recurring investments—require manual intervention, making the process tedious and error-prone.
+- **General Documentation**: `docs/general/`
+  - [Main README](docs/general/README.md)
+  - [Tests Documentation](docs/general/README.md)
+  - [Repomix Output](docs/general/repomix-output.md)
 
-These challenges create significant friction, discourage adoption, and prevent users from fully leveraging the benefits of blockchain technology. There is a clear need for an intelligent, unified, and user-friendly solution that streamlines blockchain financial management, automates routine and advanced tasks, and empowers users to participate in the ecosystem with ease—all through natural language interactions.
+- **Backend Documentation**: `docs/backend/`
+  - [Backend README](docs/backend/README.md)
+  - [USDC Integration Guide](docs/backend/USDC_FUNDING_GUIDE.md)
+  - [Environment Setup](docs/backend/ENVIRONMENT_SETUP.md)
+  - [Wallet Service Modifications](docs/backend/WALLET_SERVICE_MODIFICATIONS.md)
+  - [Funding README](docs/backend/FUNDING_README.md)
+  - [USDC Issue Analysis](docs/backend/USDC_ISSUE_ANALYSIS.md)
+  - [OpenAI Tool Selection](docs/backend/OPENAI_TOOL_SELECTION.md)
+  - [Direct Tool Integration Report](docs/backend/DIRECT_TOOL_INTEGRATION_REPORT.md)
+  - [Environment Summary](docs/backend/ENVIRONMENT_SUMMARY.md)
+  - [USDC Integration README](docs/backend/USDC_INTEGRATION_README.md)
+  - [Token Transfer README](docs/backend/TOKEN_TRANSFER_README.md)
+  - [USDC Integration](docs/backend/USDC_INTEGRATION.md)
+  - [Wallet Creation with USDC](docs/backend/WALLET_CREATION_WITH_USDC.md)
+  - [Integration Summary](docs/backend/INTEGRATION_SUMMARY.md)
+  - [USDC Integration Complete](docs/backend/USDC_INTEGRATION_COMPLETE.md)
+  - [LangGraph Implementation](docs/backend/LANGGRAPH_IMPLEMENTATION.md)
 
-## Solution
-Ole Agent solves these challenges by providing a unified, intelligent, and conversational interface for all blockchain financial activities. Key aspects of the solution include:
+- **Soroban Documentation**: `docs/soroban/`
+  - [Soroban README](docs/soroban/README.md)
+  - [Hello World Package README](docs/soroban/README.md)
 
-- **Unified Platform**: All major blockchain financial actions—sending/receiving tokens, creating payment links, investing, swapping, and more—are accessible from a single, seamless interface.
-- **One-Time Wallet Integration**: Users connect their wallet once and can interact with multiple services without repeated onboarding or reconnection.
-- **Natural Language Prompts**: The AI agent interprets user instructions in plain language, eliminating the need to understand complex blockchain concepts or technical jargon.
-- **Automated and Intelligent Actions**: Routine and advanced tasks (like recurring investments, DCA, or trend monitoring) are automated, saving users time and reducing the risk of error.
-- **Personalized Financial Assistant**: The agent can invest on the user's behalf based on their risk tolerance, monitor trends, and alert users to opportunities, ensuring they never miss out due to lack of time or expertise.
-- **Frictionless Experience**: By consolidating fragmented workflows and automating repetitive tasks, the Ole AI Agent empowers users to fully leverage blockchain technology with ease and confidence.
+- **Frontend Documentation**: `docs/frontend/`
+  - [Payment Page README](docs/frontend/README.md)
 
-## Features
+## Project Structure
 
-![AI Chat Interface](./src/assets/chat.png)
+```
+Dasta/
+├── docs/              # All documentation
+├── tests/             # All test files
+├── src/               # Frontend React application
+├── backend/           # Backend Node.js application
+├── soroban/           # Soroban smart contracts
+└── README.md          # This file
+```
 
-- **AI-Powered Token Transfers**: Send tokens to any address using simple prompts.
-- **Payment Link Creation**: Generate fixed or open payment links for receiving payments or donations.
-- **Wallet Balance Checks**: Instantly view your balances for all supported tokens.
-- **Token Swaps**: Swap between supported assets directly from the interface.
-- **Payment Link Status & History**: Track the status of payment links and view your payment link history.
-- **Transaction History**: Review your wallet's transaction history in a unified view.
-- **DCA (Dollar Cost Averaging) Positions**: Set up and manage recurring investments in supported tokens.
-- **Prompt-Based Investing**: Instruct the agent to invest on your behalf based on your risk tolerance and preferences.
-- **Trend Monitoring & Alerts**: Get notified about market trends and investment opportunities automatically.
+## Quick Start
+
+1. **Frontend**: Navigate to the root directory and run `npm install && npm run dev`
+2. **Backend**: Navigate to `backend/` and run `npm install && npm start`
+3. **Soroban**: Navigate to `soroban/` and run `cargo build`
+
+For detailed setup instructions, see the documentation in the `docs/` folder. 

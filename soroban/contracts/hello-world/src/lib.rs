@@ -467,4 +467,6 @@ impl PayLink {
     }
 }
 
-mod test;
+mod test {
+    include!("../../../tests/soroban/test.rs");
+}

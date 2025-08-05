@@ -1,10 +1,9 @@
-import StellarSdk from '@stellar/stellar-sdk';
+import * as StellarSdk from '@stellar/stellar-sdk';
 import Wallet from '../models/Wallet';
 import WalletBalance from '../models/WalletBalance';
 import crypto from 'crypto';
-
-import dotenv from 'dotenv';
-dotenv.config();
+import { config } from '../config/environment';
+import metricsService from './metricsService';
 
 interface IWallet {
   _id: string;
@@ -36,19 +35,14 @@ class WalletService {
   private encryptionKey: string;
 
   constructor() {
-    const network = process.env.STELLAR_NETWORK || 'testnet';
-    const horizonUrl = network === 'testnet' 
-      ? 'https://horizon-testnet.stellar.org' 
-      : 'https://horizon.stellar.org';
-    
-    this.server = new StellarSdk.Horizon.Server(horizonUrl);
+    this.server = new StellarSdk.Horizon.Server(config.stellarHorizonUrl);
     
     // Use a consistent encryption key across environments
     // This should be the same key used when wallets were originally created
-    this.encryptionKey = process.env.WALLET_ENCRYPTION_KEY || 'your-wallet-encryption-key';
+    this.encryptionKey = config.walletEncryptionKey;
     
-    if (!process.env.WALLET_ENCRYPTION_KEY) {
-      console.warn('⚠️ WARNING: WALLET_ENCRYPTION_KEY not set. Using fallback key. This may cause decryption issues.');
+    if (!config.walletEncryptionKey || config.walletEncryptionKey === 'eeusdnisncienu') {
+      console.warn('⚠️ WARNING: Using default wallet encryption key. Change WALLET_ENCRYPTION_KEY in production.');
     }
   }
 
@@ -112,7 +106,7 @@ class WalletService {
     }
   }
 
-  // Generate new Stellar wallet
+  // Generate new Stellar wallet with USDC trustline and funding
   async generateNewWallet(userId: string, network: string = 'testnet'): Promise<IWallet> {
     try {
       // Generate new keypair
@@ -135,6 +129,15 @@ class WalletService {
       await wallet.save();
       console.log(`✅ Generated new wallet: ${keypair.publicKey()}`);
       
+      // Track wallet creation metric
+      await metricsService.trackMetric('wallet_creation', userId, keypair.publicKey(), {
+        network,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Fund the wallet with XLM and establish USDC trustline
+      await this.fundAndSetupWallet(keypair);
+      
       return {
         _id: wallet._id?.toString() || '',
         userId: wallet.userId?.toString() || '',
@@ -150,6 +153,118 @@ class WalletService {
     } catch (error) {
       console.error('Error generating wallet:', error);
       throw error;
+    }
+  }
+
+  // Fund wallet with XLM and establish USDC trustline
+  private async fundAndSetupWallet(keypair: StellarSdk.Keypair): Promise<void> {
+    try {
+      console.log(`🚀 Setting up wallet: ${keypair.publicKey()}`);
+      
+      // Step 1: Fund with XLM using Friendbot
+      await this.fundWalletWithXLM(keypair.publicKey());
+      
+      // Step 2: Establish USDC trustline
+      await this.establishUSDCTrustline(keypair);
+      
+      // Step 3: Fund with USDC
+      await this.fundWalletWithUSDC(keypair.publicKey());
+      
+      console.log(`✅ Wallet setup complete: ${keypair.publicKey()}`);
+    } catch (error) {
+      console.error('Error setting up wallet:', error);
+      // Don't throw error - wallet creation should still succeed even if funding fails
+    }
+  }
+
+  // Fund wallet with XLM from Friendbot
+  private async fundWalletWithXLM(publicKey: string): Promise<void> {
+    try {
+      console.log(`💰 Funding wallet with XLM from Friendbot: ${publicKey}`);
+      
+      // Use Friendbot to fund the wallet with XLM
+      await this.server.friendbot(publicKey).call();
+      console.log(`✅ XLM funding successful via Friendbot`);
+      
+    } catch (error) {
+      console.warn('⚠️ XLM funding error:', error);
+      // Don't throw - wallet creation should still succeed
+    }
+  }
+
+  // Establish USDC trustline
+  private async establishUSDCTrustline(keypair: StellarSdk.Keypair): Promise<void> {
+    try {
+      console.log(`🔧 Establishing USDC trustline: ${keypair.publicKey()}`);
+      
+      const USDC_ASSET_ISSUER = 'GAHPYWLK6YRN7CVYZOO4H3VDRZ7PVF5UJGLZCSPAEIKJE2XSWF5LAGER';
+      const USDC_ASSET_CODE = 'USDC';
+      
+      // Wait a moment for XLM funding to be processed
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Load the account
+      const account = await this.server.loadAccount(keypair.publicKey());
+      
+      // Create USDC asset
+      const usdcAsset = new StellarSdk.Asset(USDC_ASSET_CODE, USDC_ASSET_ISSUER);
+      
+      // Create change trust operation
+      const changeTrustOp = StellarSdk.Operation.changeTrust({
+        asset: usdcAsset,
+        limit: '922337203685.4775807', // Maximum limit
+      });
+
+      // Build transaction
+      const transaction = new StellarSdk.TransactionBuilder(account, {
+        fee: '100',
+        networkPassphrase: StellarSdk.Networks.TESTNET,
+      })
+        .addOperation(changeTrustOp)
+        .setTimeout(30)
+        .build();
+
+      // Sign transaction
+      transaction.sign(keypair);
+      
+      // Submit transaction
+      const result = await this.server.submitTransaction(transaction);
+      console.log(`✅ USDC trustline established: ${result.hash}`);
+      
+    } catch (error: any) {
+      console.warn('⚠️ USDC trustline establishment failed:', error.message);
+      // Don't throw - wallet creation should still succeed
+    }
+  }
+
+  // Fund wallet with USDC
+  private async fundWalletWithUSDC(publicKey: string): Promise<void> {
+    try {
+      console.log(`💵 Funding wallet with USDC: ${publicKey}`);
+      
+      // Import and use the USDC funding service
+      const { USDCFundingService, defaultFundingConfig } = await import('./usdcFundingService');
+      const fundingService = new USDCFundingService(defaultFundingConfig);
+      
+      // Check if funding wallet is ready
+      const fundingStatus = await fundingService.getFundingWalletStatus();
+      if (!fundingStatus.exists || parseFloat(fundingStatus.usdcBalance) < 0.01) {
+        console.log(`⚠️ USDC funding wallet not ready. Status:`, fundingStatus);
+        console.log(`💡 Note: USDC funding requires manual intervention or a funding service`);
+        return;
+      }
+      
+      // Send USDC to the wallet
+      const result = await fundingService.sendUSDCToWallet(publicKey, '0.1000000'); // Send 0.1 USDC
+      if (result.success) {
+        console.log(`✅ USDC funding successful: ${result.transactionHash}`);
+      } else {
+        console.log(`⚠️ USDC funding failed: ${result.error}`);
+      }
+      
+    } catch (error) {
+      console.warn('⚠️ USDC funding error:', error);
+      // Don't throw - wallet creation should still succeed
     }
   }
 

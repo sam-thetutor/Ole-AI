@@ -1,5 +1,5 @@
- //const API_BASE_URL = 'https://ole-be-production.up.railway.app/api';
-const API_BASE_URL = 'http://localhost:3001/api';
+ const API_BASE_URL = 'https://ole-be-production.up.railway.app/api';
+//const API_BASE_URL = 'http://localhost:3001/api';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -364,6 +364,23 @@ class ApiService {
       };
     }
     return await this.request<any>(`/payment-links/stats/${walletAddress}`);
+  }
+
+  // Metrics methods
+  async getMetricsSummary(): Promise<ApiResponse<any>> {
+    return await this.request<any>('/metrics/summary');
+  }
+
+  async getUserMetrics(): Promise<ApiResponse<any>> {
+    return await this.request<any>('/metrics/user');
+  }
+
+  async getRecentMetrics(): Promise<ApiResponse<any>> {
+    return await this.request<any>('/metrics/recent');
+  }
+
+  async getMetricsByRange(type: string, startDate: string, endDate: string): Promise<ApiResponse<any>> {
+    return await this.request<any>(`/metrics/range?type=${type}&startDate=${startDate}&endDate=${endDate}`);
   }
 }
 

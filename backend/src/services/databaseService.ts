@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { config } from '../config/environment';
 
 interface ConnectionStatus {
   isConnected: boolean;
@@ -15,9 +16,9 @@ class DatabaseService {
         return;
       }
 
-      const mongoUri = process.env.MONGODB_URI;
+      const mongoUri = config.mongodbUri;
       if (!mongoUri) {
-        throw new Error('MONGODB_URI environment variable is not set');
+        throw new Error('MongoDB URI is not configured');
       }
 
       await mongoose.connect(mongoUri);
