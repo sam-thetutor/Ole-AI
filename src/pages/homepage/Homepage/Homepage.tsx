@@ -134,12 +134,11 @@ const Homepage: React.FC = () => {
             </div>
             <div className="phase-content">
               <ul>
-                <li>🔄 Advanced AI Commands</li>
-                <li>🔄 Token Swapping Integration</li>
-                <li>🔄 DCA (Dollar Cost Averaging)</li>
-                <li>🔄 Payment Link Generation</li>
-                <li>🔄 Transaction History & Analytics</li>
-                <li>🔄 Multi-wallet Support</li>
+                <li>🔄 Soroswap and Defindex Integration</li>
+                <li>🔄 Deploy Smart contracts feature</li>
+                <li>🔄 Create tokens</li>
+                <li>🔄 Create NFTs</li>
+                <li>🔄 Create Payment Links</li>
               </ul>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext';
-import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2, Menu, X, Wallet, History, Trophy, Calendar, Clock, Link } from 'lucide-react';
-import apiService from '../../../services/api';
+import { Send, BarChart3, RefreshCw, TrendingUp, CreditCard, Loader2, Menu, X, Wallet, History, Link, AlertCircle } from 'lucide-react';
+import { useDataStoreHook, useWallet, useUserProfile } from '../../../hooks';
 import PaymentLinks from '../PaymentLinks/PaymentLinks';
 import './Dashboard.css';
 
@@ -21,66 +21,45 @@ interface Transaction {
   operation_count?: number;
 }
 
-interface WalletBalance {
-  asset_type: string;
-  asset_code?: string;
-  asset_issuer?: string;
-  balance: string;
-  limit?: string;
-  buying_liabilities?: string;
-  selling_liabilities?: string;
-  is_authorized?: boolean;
-  is_authorized_to_maintain_liabilities?: boolean;
-}
-
-interface LeaderboardEntry {
-  id: string;
-  rank: number;
-  username: string;
-  address: string;
-  score: number;
-  transactions: number;
-  volume: string;
-  change: number; // percentage change
-}
-
-type DashboardSection = 'wallet' | 'transactions' | 'leaderboard' | 'payment-links';
+type DashboardSection = 'wallet' | 'transactions' | 'payment-links';
 
 const Dashboard: React.FC = () => {
-  const { publicKey, generatedWallet, refreshGeneratedWallet } = useStellarWallet();
-  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
-  const [dashboardGeneratedWallet, setDashboardGeneratedWallet] = useState<{
-    publicKey: string;
-    network: string;
-    balances?: WalletBalance[];
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { publicKey, generatedWallet } = useStellarWallet();
   const [activeSection, setActiveSection] = useState<DashboardSection>('wallet');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [leaderboardType, setLeaderboardType] = useState<'weekly' | 'monthly'>('weekly');
+  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Mock leaderboard data
-  const weeklyLeaderboard: LeaderboardEntry[] = [
-    { id: '1', rank: 1, username: 'CryptoKing', address: 'GCUE26...F4JN', score: 9850, transactions: 127, volume: '125,430 XLM', change: 12.5 },
-    { id: '2', rank: 2, username: 'StellarPro', address: 'GB7XY...K9LM', score: 8740, transactions: 98, volume: '98,750 XLM', change: 8.3 },
-    { id: '3', rank: 3, username: 'BlockchainQueen', address: 'GD3KJ...P2QR', score: 7620, transactions: 85, volume: '87,320 XLM', change: -2.1 },
-    { id: '4', rank: 4, username: 'XLMWhale', address: 'GA5X4...M8ST', score: 6540, transactions: 72, volume: '76,890 XLM', change: 15.7 },
-    { id: '5', rank: 5, username: 'DeFiMaster', address: 'GC9KL...N4UV', score: 5890, transactions: 63, volume: '65,420 XLM', change: 5.2 },
-  ];
-
-  const monthlyLeaderboard: LeaderboardEntry[] = [
-    { id: '1', rank: 1, username: 'CryptoKing', address: 'GCUE26...F4JN', score: 45230, transactions: 589, volume: '567,890 XLM', change: 18.7 },
-    { id: '2', rank: 2, username: 'StellarPro', address: 'GB7XY...K9LM', score: 39870, transactions: 445, volume: '498,750 XLM', change: 12.3 },
-    { id: '3', rank: 3, username: 'BlockchainQueen', address: 'GD3KJ...P2QR', score: 34560, transactions: 398, volume: '432,100 XLM', change: -1.5 },
-    { id: '4', rank: 4, username: 'XLMWhale', address: 'GA5X4...M8ST', score: 29890, transactions: 325, volume: '345,670 XLM', change: 22.1 },
-    { id: '5', rank: 5, username: 'DeFiMaster', address: 'GC9KL...N4UV', score: 26780, transactions: 289, volume: '298,450 XLM', change: 8.9 },
-  ];
+  // Use data store hooks
+  const { 
+    refreshUserData, 
+    getXlmBalance, 
+    isAuthenticated,
+    isLoading: isDataLoading,
+    hasErrors,
+    getAllErrors
+  } = useDataStoreHook();
+  
+  const { walletData, loading: walletLoading, error: walletError, fetchWalletData } = useWallet();
+  const { userProfile, loading: userProfileLoading } = useUserProfile();
 
   useEffect(() => {
-    if (publicKey) {
-      loadDashboardData();
+    try {
+      console.log('Dashboard: Checking authentication...');
+      console.log('Dashboard: publicKey:', publicKey);
+      console.log('Dashboard: isAuthenticated function:', typeof isAuthenticated);
+      
+      if (publicKey && isAuthenticated()) {
+        console.log('Dashboard: User is authenticated, refreshing data...');
+        // Load all user data when authenticated
+        refreshUserData();
+      } else {
+        console.log('Dashboard: User is not authenticated or no public key');
+      }
+    } catch (error) {
+      console.error('Error checking authentication:', error);
     }
-  }, [publicKey]);
+  }, [publicKey, isAuthenticated]);
 
   // Debug generated wallet data
   useEffect(() => {
@@ -90,67 +69,19 @@ const Dashboard: React.FC = () => {
     }
   }, [generatedWallet]);
 
-  // Automatically fetch transaction history when dashboardGeneratedWallet changes
-  useEffect(() => {
-    if (dashboardGeneratedWallet?.publicKey) {
-      console.log('Dashboard generated wallet changed, fetching transaction history...');
-      fetchTransactionHistory();
-    }
-  }, [dashboardGeneratedWallet]);
-
-  const loadDashboardData = async () => {
-    if (!publicKey) return;
-    
-    try {
-      setLoading(true);
-      
-      // Fetch generated wallet from backend
-      await fetchGeneratedWallet();
-      
-      // Refresh generated wallet to get latest balances
-      await refreshGeneratedWallet();
-      
-      // Fetch transaction history
-      await fetchTransactionHistory();
-    } catch (error) {
-      console.error('Error loading dashboard data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-
-
-
-  const fetchGeneratedWallet = async () => {
-    try {
-      console.log('Fetching generated wallet from backend...');
-      const response = await apiService.getGeneratedWallet();
-      console.log('Get generated wallet response:', response);
-      
-      if (response.success && response.data) {
-        setDashboardGeneratedWallet(response.data);
-        console.log('Generated wallet set in dashboard:', response.data);
-        
-        // Automatically fetch transaction history when wallet is loaded
-        await fetchTransactionHistory();
-      } else {
-        console.error('Failed to fetch generated wallet:', response);
-      }
-    } catch (error) {
-      console.error('Error fetching generated wallet:', error);
-    }
+  const handleRefreshData = () => {
+    refreshUserData();
   };
 
   const fetchTransactionHistory = async () => {
-    if (!dashboardGeneratedWallet?.publicKey) {
+    if (!generatedWallet?.publicKey) {
       console.log('No generated wallet available for transaction history');
       return;
     }
 
+    setLoading(true);
     try {
-      console.log('Fetching transaction history for:', dashboardGeneratedWallet.publicKey);
+      console.log('Fetching transaction history for:', generatedWallet.publicKey);
 
       // Fetch directly from Stellar Horizon API
       const network = 'testnet'; // You can make this configurable
@@ -159,10 +90,10 @@ const Dashboard: React.FC = () => {
         : 'https://horizon.stellar.org';
       
       const response = await fetch(
-        `${horizonUrl}/accounts/${dashboardGeneratedWallet.publicKey}/transactions?limit=20&order=desc`
+        `${horizonUrl}/accounts/${generatedWallet.publicKey}/transactions?limit=20&order=desc`
       );
 
-      console.log("transaction husotyr",response);
+      console.log("transaction history", response);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -265,27 +196,21 @@ const Dashboard: React.FC = () => {
     } catch (error) {
       console.error('Error fetching transaction history:', error);
       setRecentTransactions([]);
+    } finally {
+      setLoading(false);
     }
   };
+
+  // Load transaction history when wallet data is available
+  useEffect(() => {
+    if (generatedWallet?.publicKey) {
+      fetchTransactionHistory();
+    }
+  }, [generatedWallet?.publicKey]);
 
   const formatAddress = (address: string) => {
     if (!address || address === 'Unknown') return 'Unknown';
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
-
-  // Filter balances to only show XLM and USDC
-  const filterXLMAndUSDCBalances = (balances: WalletBalance[]): WalletBalance[] => {
-    return balances.filter(balance => {
-      // Include XLM (native asset)
-      if (balance.asset_type === 'native') {
-        return true;
-      }
-      // Include USDC
-      if (balance.asset_code === 'USDC') {
-        return true;
-      }
-      return false;
-    });
   };
 
   const toggleSidebar = () => {
@@ -296,66 +221,107 @@ const Dashboard: React.FC = () => {
     setSidebarOpen(false);
   };
 
-  const getRankIcon = (rank: number) => {
-    switch (rank) {
-      case 1: return '🥇';
-      case 2: return '🥈';
-      case 3: return '🥉';
-      default: return `#${rank}`;
-    }
-  };
-
-  const getChangeColor = (change: number) => {
-    return change >= 0 ? 'text-green-400' : 'text-red-400';
-  };
-
   const renderWalletSection = () => (
     <div className="dashboard-content">
       <div className="dashboard-header">
         <h1 className="dashboard-title">Wallet Overview</h1>
         <p className="dashboard-subtitle">Your Stellar wallet information</p>
+        <button 
+          className="refresh-data-btn"
+          onClick={handleRefreshData}
+          disabled={isDataLoading()}
+        >
+          {isDataLoading() ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <RefreshCw className="w-4 h-4" />
+          )}
+          <span>Refresh Data</span>
+        </button>
       </div>
+
+      {/* Error Display */}
+      {hasErrors() && (
+        <div className="error-banner">
+          <AlertCircle className="w-5 h-5 text-red-500" />
+          <div className="error-content">
+            <h3>Some data failed to load</h3>
+            <div className="error-list">
+              {getAllErrors().map((error, index) => (
+                <span key={index} className="error-item">
+                  {error.type}: {error.error}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="dashboard-grid">
         {/* Generated Wallet Info Card */}
-        {dashboardGeneratedWallet ? (
+        {walletLoading ? (
           <div className="dashboard-card generated-wallet-card">
             <h3 className="card-title">Generated Wallet</h3>
             <div className="wallet-details">
               <div className="detail-item">
+                <span className="detail-label">Status:</span>
+                <span className="detail-value">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Loading wallet data...
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : walletError ? (
+          <div className="dashboard-card generated-wallet-card error-card">
+            <h3 className="card-title">Generated Wallet</h3>
+            <div className="wallet-details">
+              <div className="detail-item">
+                <span className="detail-label">Status:</span>
+                <span className="detail-value error-text">Failed to load wallet data</span>
+              </div>
+              <div className="detail-item">
+                <button 
+                  className="retry-btn"
+                  onClick={fetchWalletData}
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Retry
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : walletData ? (
+          <div className="dashboard-card generated-wallet-card">
+            <h3 className="card-title">Generated Wallet</h3>
+            <div className="wallet-details">
+              {/* Username Display */}
+              <div className="detail-item">
+                <span className="detail-label">Username:</span>
+                <span className="detail-value">
+                  {userProfileLoading ? (
+                    <span className="loading-text">Loading...</span>
+                  ) : userProfile?.username ? (
+                    <span className="username-value">@{userProfile.username}</span>
+                  ) : (
+                    <span className="no-username">Not set</span>
+                  )}
+                </span>
+              </div>
+              <div className="detail-item">
                 <span className="detail-label">Public Key:</span>
-                <span className="detail-value">{formatAddress(dashboardGeneratedWallet.publicKey)}</span>
+                <span className="detail-value">{formatAddress(walletData.publicKey)}</span>
               </div>
               <div className="detail-item">
                 <span className="detail-label">Network:</span>
-                <span className="detail-value">{dashboardGeneratedWallet.network}</span>
+                <span className="detail-value">{walletData.network}</span>
               </div>
-              {/* <div className="detail-item">
-                <span className="detail-label">Status:</span>
-                <span className="detail-value status-generated">Generated</span>
-              </div> */}
-              {dashboardGeneratedWallet.balances && dashboardGeneratedWallet.balances.length > 0 ? (
-                <div className="balances-section">
-                  <h4 className="balances-title">Balances:</h4>
-                  {filterXLMAndUSDCBalances(dashboardGeneratedWallet.balances).map((balance: any, index: number) => (
-                    <div key={index} className="balance-item">
-                      <span className="balance-asset">
-                        {balance.asset_type === 'native' ? 'XLM' : balance.asset_code}
-                      </span>
-                      <span className="balance-amount">
-                        {parseFloat(balance.balance).toFixed(6)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="detail-item">
-                  <span className="detail-label">XLM Balance:</span>
-                  <span className="detail-value balance-value">
-                    {dashboardGeneratedWallet.balances?.find((b: any) => b.asset_type === 'native')?.balance || '0.000000'} XLM
-                  </span>
-                </div>
-              )}
+              <div className="detail-item">
+                <span className="detail-label">XLM Balance:</span>
+                <span className="detail-value balance-value">
+                  {getXlmBalance()} XLM
+                </span>
+              </div>
               
               {/* Transaction Count Display */}
               <div className="detail-item">
@@ -373,15 +339,15 @@ const Dashboard: React.FC = () => {
             <div className="wallet-details">
               <div className="detail-item">
                 <span className="detail-label">Status:</span>
-                <span className="detail-value">Loading...</span>
+                <span className="detail-value">No wallet data available</span>
               </div>
               <div className="detail-item">
                 <button 
                   className="refresh-balance-btn"
-                  onClick={fetchGeneratedWallet}
+                  onClick={fetchWalletData}
                 >
-                  <RefreshCw size={16} />
-                  Load Generated Wallet
+                  <RefreshCw className="w-4 h-4" />
+                  Load Wallet Data
                 </button>
               </div>
             </div>
@@ -416,7 +382,7 @@ const Dashboard: React.FC = () => {
           <h3 className="card-title">Analytics</h3>
           <div className="analytics-grid">
             <div className="analytics-item">
-              <div className="analytics-value">0</div>
+              <div className="analytics-value">{recentTransactions.length}</div>
               <div className="analytics-label">Total Transactions</div>
             </div>
             <div className="analytics-item">
@@ -442,6 +408,18 @@ const Dashboard: React.FC = () => {
       <div className="dashboard-header">
         <h1 className="dashboard-title">Transaction History</h1>
         <p className="dashboard-subtitle">Your recent Stellar transactions</p>
+        <button 
+          className="refresh-data-btn"
+          onClick={fetchTransactionHistory}
+          disabled={loading}
+        >
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <RefreshCw className="w-4 h-4" />
+          )}
+          <span>Refresh Transactions</span>
+        </button>
       </div>
 
       <div className="dashboard-grid">
@@ -455,7 +433,7 @@ const Dashboard: React.FC = () => {
             </div>
           ) : recentTransactions.length > 0 ? (
             <div className="transactions-list">
-              {recentTransactions.map((tx) => (
+              {recentTransactions.map((tx: Transaction) => (
                 <div key={tx.id} className="transaction-item">
                   <div className="transaction-icon">
                     {tx.type === 'payment' ? <Send size={20} /> : <CreditCard size={20} />}
@@ -485,75 +463,20 @@ const Dashboard: React.FC = () => {
           ) : (
             <div className="no-transactions">
               <p>No recent transactions found</p>
+              <button 
+                className="fetch-transactions-btn"
+                onClick={fetchTransactionHistory}
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-4 h-4" />
+                )}
+                <span>Fetch Transactions</span>
+              </button>
             </div>
           )}
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderLeaderboardSection = () => (
-    <div className="dashboard-content">
-      <div className="dashboard-header">
-        <h1 className="dashboard-title">Leaderboard</h1>
-        <p className="dashboard-subtitle">Top performers in the Stellar ecosystem</p>
-      </div>
-
-      <div className="dashboard-grid">
-        {/* Leaderboard Card */}
-        <div className="dashboard-card leaderboard-card full-width">
-          <div className="leaderboard-header">
-            <h3 className="card-title">Top Traders</h3>
-            <div className="leaderboard-tabs">
-              <button
-                className={`leaderboard-tab ${leaderboardType === 'weekly' ? 'active' : ''}`}
-                onClick={() => setLeaderboardType('weekly')}
-              >
-                <Clock size={16} />
-                <span>Weekly</span>
-              </button>
-              <button
-                className={`leaderboard-tab ${leaderboardType === 'monthly' ? 'active' : ''}`}
-                onClick={() => setLeaderboardType('monthly')}
-              >
-                <Calendar size={16} />
-                <span>Monthly</span>
-              </button>
-            </div>
-          </div>
-
-          <div className="leaderboard-content">
-            <div className="leaderboard-table">
-              <div className="leaderboard-header-row">
-                <div className="leaderboard-cell rank-cell">Rank</div>
-                <div className="leaderboard-cell user-cell">User</div>
-                <div className="leaderboard-cell score-cell">Score</div>
-                <div className="leaderboard-cell change-cell">Change</div>
-              </div>
-
-              {(leaderboardType === 'weekly' ? weeklyLeaderboard : monthlyLeaderboard).map((entry) => (
-                <div key={entry.id} className="leaderboard-row">
-                  <div className="leaderboard-cell rank-cell">
-                    <span className="rank-icon">{getRankIcon(entry.rank)}</span>
-                  </div>
-                  <div className="leaderboard-cell user-cell">
-                    <div className="user-info">
-                      <div className="username">{entry.username}</div>
-                      <div className="address">{entry.address}</div>
-                    </div>
-                  </div>
-                  <div className="leaderboard-cell score-cell">
-                    <span className="score">{entry.score.toLocaleString()}</span>
-                  </div>
-                  <div className="leaderboard-cell change-cell">
-                    <span className={`change ${getChangeColor(entry.change)}`}>
-                      {entry.change >= 0 ? '+' : ''}{entry.change}%
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -599,17 +522,6 @@ const Dashboard: React.FC = () => {
           </button>
 
           <button
-            className={`sidebar-nav-item ${activeSection === 'leaderboard' ? 'active' : ''}`}
-            onClick={() => {
-              setActiveSection('leaderboard');
-              closeSidebar();
-            }}
-          >
-            <Trophy size={20} />
-            <span>Leaderboard</span>
-          </button>
-
-          <button
             className={`sidebar-nav-item ${activeSection === 'payment-links' ? 'active' : ''}`}
             onClick={() => {
               setActiveSection('payment-links');
@@ -631,15 +543,13 @@ const Dashboard: React.FC = () => {
           </button>
           <h1 className="mobile-title">
             {activeSection === 'wallet' ? 'Wallet' : 
-             activeSection === 'transactions' ? 'Transaction History' : 
-             activeSection === 'leaderboard' ? 'Leaderboard' : 'Payment Links'}
+             activeSection === 'transactions' ? 'Transaction History' : 'Payment Links'}
           </h1>
         </div>
 
         {/* Content */}
         {activeSection === 'wallet' ? renderWalletSection() : 
-         activeSection === 'transactions' ? renderTransactionsSection() : 
-         activeSection === 'leaderboard' ? renderLeaderboardSection() :
+         activeSection === 'transactions' ? renderTransactionsSection() :
          <PaymentLinks />}
       </main>
     </div>

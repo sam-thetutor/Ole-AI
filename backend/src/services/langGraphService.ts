@@ -183,6 +183,9 @@ Available intents:
 - get_payment_stats: User wants payment link statistics
 - get_wallet_summary: User wants a comprehensive wallet overview
 - get_time: User wants current date/time
+- get_username: User wants to check their username
+- set_username: User wants to set or change their username
+- check_username: User wants to check if a username is available
 - greeting: User is saying hello or asking what you can do
 - unknown: Intent is unclear or not supported
 
@@ -224,6 +227,9 @@ Respond with ONLY the intent name.`;
       get_payment_stats: "get_payment_link_stats",
       get_wallet_summary: "get_wallet_summary",
       get_time: "get_current_datetime",
+      get_username: "get_username",
+      set_username: "set_username",
+      check_username: "check_username_availability",
       greeting: "greeting",
       unknown: "unknown",
     };
@@ -263,6 +269,9 @@ Available tools and their parameters:
 - get_payment_link_stats: { "userId": "string" }
 - get_wallet_summary: { "userId": "string" }
 - get_current_datetime: {}
+- get_username: { "userId": "string" }
+- set_username: { "userId": "string", "username": "string" }
+- check_username_availability: { "username": "string" }
 
 Respond with ONLY a valid JSON object. Do not include markdown formatting, code blocks, or any other text. For missing parameters, use null or empty string.`;
 
@@ -289,8 +298,10 @@ Respond with ONLY a valid JSON object. Do not include markdown formatting, code 
         toolParams = {};
       }
 
-      // Always include userId
-      toolParams = { ...toolParams, userId: state.user_id };
+      // Include userId for tools that need it (but not for check_username_availability)
+      if (state.selected_tool !== "check_username_availability") {
+        toolParams = { ...toolParams, userId: state.user_id };
+      }
 
       return {
         tool_params: toolParams,
@@ -357,11 +368,14 @@ Respond with ONLY a valid JSON object. Do not include markdown formatting, code 
         `• Sending XLM tokens to other addresses\n` +
         `• Creating payment links for receiving payments\n` +
         `• Getting transaction history and wallet summaries\n` +
-        `• Managing your payment links\n\n` +
+        `• Managing your payment links\n` +
+        `• Managing your username\n\n` +
         `Try asking me:\n` +
         `• "What's my wallet balance?"\n` +
         `• "Show my wallet info"\n` +
         `• "Create a payment link for 50 XLM"\n` +
+        `• "What's my username?"\n` +
+        `• "Set my username to crypto_king"\n` +
         `• "What can you do?"`;
     } else if (state.selected_tool === "unknown") {
       response =
@@ -372,7 +386,8 @@ Respond with ONLY a valid JSON object. Do not include markdown formatting, code 
         `• Sending XLM tokens to other addresses\n` +
         `• Getting a comprehensive wallet summary with transaction history\n` +
         `• Creating payment links for receiving payments\n` +
-        `• Managing and tracking your payment links\n\n` +
+        `• Managing and tracking your payment links\n` +
+        `• Managing your username\n\n` +
         `Try asking me:\n` +
         `• "What's the current time?"\n` +
         `• "What's my wallet balance?"\n` +
@@ -382,7 +397,9 @@ Respond with ONLY a valid JSON object. Do not include markdown formatting, code 
         `• "Create a payment link for 50 XLM"\n` +
         `• "Create a global payment link for donations"\n` +
         `• "Show my payment links"\n` +
-        `• "Payment link statistics"`;
+        `• "Payment link statistics"\n` +
+        `• "What's my username?"\n` +
+        `• "Set my username to crypto_king"`;
     } else if (state.tool_results.length > 0) {
       response = state.tool_results[0];
     } else {

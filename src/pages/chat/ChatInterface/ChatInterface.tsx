@@ -180,7 +180,6 @@ const ChatInterface: React.FC = () => {
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Ask me about the current date/time, send tokens, check balances, or manage your Stellar assets..."
             disabled={isLoading}
             className="chat-input"
           />

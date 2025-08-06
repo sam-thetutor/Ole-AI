@@ -83,29 +83,47 @@ export const StellarWalletProvider: React.FC<{ children: ReactNode }> = ({ child
   const connect = async () => {
     setConnecting(true);
     try {
-      const { address } = await kit.getAddress();
-      setPublicKey(address);
+      await kit.openModal({
+        onWalletSelected: async (option) => {
+          try {
+            kit.setWallet(option.id);
+            const { address } = await kit.getAddress();
+            setPublicKey(address);
 
-      // Connect to backend and get tokens
-      const response = await apiService.connectWallet(address);
-      if (response.success) {
-        setIsAuthenticated(true);
-        
-        // If this is a new user, they'll have a generated wallet
-        if (response.data?.generatedWallet) {
-          setGeneratedWallet(response.data.generatedWallet);
-        } else {
-          // Existing user, fetch their generated wallet
-          await refreshGeneratedWallet();
+            // Connect to backend and get tokens
+            const response = await apiService.connectWallet(address);
+            if (response.success) {
+              setIsAuthenticated(true);
+              
+              // If this is a new user, they'll have a generated wallet
+              if (response.data?.generatedWallet) {
+                setGeneratedWallet(response.data.generatedWallet);
+              } else {
+                // Existing user, fetch their generated wallet
+                await refreshGeneratedWallet();
+              }
+              
+              console.log('Wallet connected and authenticated with backend');
+            } else {
+              console.error('Backend authentication failed:', response);
+              throw new Error('Backend authentication failed');
+            }
+          } catch (error) {
+            console.error('Failed to get address or authenticate:', error);
+            throw error;
+          }
         }
-        
-        console.log('Wallet connected and authenticated with backend');
-      } else {
-        console.error('Backend authentication failed:', response);
-      }
-    } catch (e) {
+      });
+    } catch (e: any) {
       console.error('Failed to connect wallet:', e);
-      alert('Failed to connect wallet');
+      
+      if (e.message?.includes('User rejected')) {
+        alert('Wallet connection was rejected by user');
+      } else if (e.message?.includes('No wallet')) {
+        alert('Please install a Stellar wallet extension (Freighter or Lobstr)');
+      } else {
+        alert('Failed to connect wallet: ' + (e.message || e));
+      }
     } finally {
       setConnecting(false);
     }

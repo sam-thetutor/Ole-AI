@@ -175,6 +175,124 @@
   margin: 0;
 }
 
+/* Refresh Data Button */
+.refresh-data-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  color: #00ff88;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.refresh-data-btn:hover:not(:disabled) {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+.refresh-data-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Fetch Transactions Button */
+.fetch-transactions-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  color: #00ff88;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.fetch-transactions-btn:hover:not(:disabled) {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+.fetch-transactions-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Error Banner */
+.error-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(10px);
+}
+
+.error-content h3 {
+  color: #ff4444;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.error-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.error-item {
+  color: rgba(255, 0, 0, 0.8);
+  font-size: 0.875rem;
+  font-family: 'Courier New', monospace;
+}
+
+/* Retry Button */
+.retry-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  color: #00ff88;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-size: 0.875rem;
+}
+
+.retry-btn:hover {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+/* Error Text */
+.error-text {
+  color: #ff4444 !important;
+}
+
+/* Full Width Card */
+.full-width {
+  grid-column: 1 / -1;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -249,6 +367,22 @@
   color: #00ff88;
   font-weight: 600;
   font-family: 'Courier New', monospace;
+}
+
+.username-value {
+  color: #00ff88;
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+}
+
+.no-username {
+  color: rgba(0, 255, 136, 0.5);
+  font-style: italic;
+}
+
+.loading-text {
+  color: rgba(0, 255, 136, 0.7);
+  font-style: italic;
 }
 
 .balance-value {

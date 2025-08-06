@@ -163,6 +163,73 @@ router.post('/disconnect', authLimiter, async (req: Request, res: Response) => {
   }
 });
 
+// Get user profile information
+router.get('/profile', authLimiter, async (req: Request, res: Response) => {
+  try {
+    // Get wallet address from Authorization header
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'Bearer token required'
+      });
+    }
+
+    const token = authHeader.substring(7);
+    const verification = tokenService.verifyToken(token);
+
+    if (!verification.valid) {
+      return res.status(401).json({
+        error: 'Invalid token',
+        message: verification.error
+      });
+    }
+
+    const walletAddress = verification.payload?.walletAddress;
+    if (!walletAddress) {
+      return res.status(401).json({
+        error: 'Invalid token',
+        message: 'Wallet address not found in token'
+      });
+    }
+
+    // Get user information
+    const user = await userService.getUserByWalletAddress(walletAddress);
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found',
+        message: 'User not found for this wallet address'
+      });
+    }
+
+    // Get primary wallet information
+    const primaryWallet = await walletService.getPrimaryWalletByUserId(user._id?.toString() || '');
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile retrieved successfully',
+      data: {
+        walletAddress: user.walletAddress,
+        username: user.username || null,
+        isActive: user.isActive,
+        lastLoginAt: user.lastLoginAt,
+        createdAt: user.createdAt,
+        primaryWallet: primaryWallet ? {
+          publicKey: primaryWallet.publicKey,
+          network: primaryWallet.network,
+          isActive: primaryWallet.isActive
+        } : null
+      }
+    });
+  } catch (error: any) {
+    console.error('Get profile error:', error);
+    res.status(500).json({
+      error: 'Profile retrieval failed',
+      message: 'Failed to retrieve user profile'
+    });
+  }
+});
+
 // Health check endpoint
 router.get('/health', (req: Request, res: Response) => {
   res.status(200).json({

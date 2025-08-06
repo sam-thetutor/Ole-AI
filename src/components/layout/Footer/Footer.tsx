@@ -18,7 +18,7 @@ const Footer: React.FC = () => {
             <a href="#" className="social-link" aria-label="GitHub">
               <Github size={20} />
             </a>
-            <a href="#" className="social-link" aria-label="Twitter">
+            <a href="https://x.com/ole_ai_agent" className="social-link" aria-label="Twitter">
               <Twitter size={20} />
             </a>
             <a href="#" className="social-link" aria-label="LinkedIn">

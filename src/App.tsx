@@ -5,12 +5,13 @@ import Navbar from './components/layout/Navbar/Navbar'
 import Footer from './components/layout/Footer/Footer'
 import Homepage from './pages/homepage/Homepage/Homepage'
 import Dashboard from './pages/dashboard/Dashboard/Dashboard'
+import Leaderboard from './pages/leaderboard/Leaderboard/Leaderboard'
 import ChatInterface from './pages/chat/ChatInterface/ChatInterface'
 import PaymentPage from './pages/payment/PaymentPage/PaymentPage'
 // import PaymentPageTest from '../tests/frontend/PaymentPageTest'
 import ProtectedRoute from './components/layout/ProtectedRoute/ProtectedRoute'
 import ChatModal from './components/common/ChatModal/ChatModal'
-import ChatButton from './components/common/ChatButton/ChatButton'
+
 import './styles/globals.css'
 import './styles/App.css'
 
@@ -31,6 +32,10 @@ function App() {
                       <Dashboard />
                     </ProtectedRoute>
                   } 
+                />
+                <Route 
+                  path="/leaderboard" 
+                  element={<Leaderboard />} 
                 />
                 <Route 
                   path="/chat" 
@@ -54,11 +59,11 @@ function App() {
   )
 }
 
-// Wrapper components to use hooks
-const ChatButtonWrapper = () => {
-  const { openChatModal } = useChatModal();
-  return <ChatButton onClick={openChatModal} />;
-};
+// // Wrapper components to use hooks
+// const ChatButtonWrapper = () => {
+//   const { openChatModal } = useChatModal();
+//   return <ChatButton onClick={openChatModal} />;
+// };
 
 const ChatModalWrapper = () => {
   const { isChatModalOpen, closeChatModal } = useChatModal();

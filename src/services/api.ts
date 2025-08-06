@@ -1,5 +1,5 @@
- const API_BASE_URL = 'https://ole-be-production.up.railway.app/api';
-//const API_BASE_URL = 'http://localhost:3001/api';
+ //const API_BASE_URL = 'https://ole-be-production.up.railway.app/api';
+const API_BASE_URL = 'http://localhost:3001/api';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -132,6 +132,7 @@ class ApiService {
   private getAuthHeaders(): Record<string, string> {
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     };
 
     if (this.accessToken) {
@@ -146,28 +147,50 @@ class ApiService {
     const url = `${this.baseURL}${endpoint}`;
     const config: RequestInit = {
       headers: this.getAuthHeaders(),
+      mode: 'cors',
+      credentials: 'omit',
       ...options,
     };
 
-    try {
-      const response = await fetch(url, config);
+    const maxRetries = 3;
+    let lastError: Error | null = null;
 
-      // Handle token expiration
-      if (response.status === 401 && this.refreshToken) {
-        const refreshed = await this.refreshAccessToken();
-        if (refreshed) {
-          // Retry the original request with new token
-          config.headers = this.getAuthHeaders();
-          const retryResponse = await fetch(url, config);
-          return this.handleResponse<T>(retryResponse);
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`Making API request to: ${url} (attempt ${attempt}/${maxRetries})`);
+        const response = await fetch(url, config);
+
+        // Handle token expiration
+        if (response.status === 401 && this.refreshToken) {
+          const refreshed = await this.refreshAccessToken();
+          if (refreshed) {
+            // Retry the original request with new token
+            config.headers = this.getAuthHeaders();
+            const retryResponse = await fetch(url, config);
+            return this.handleResponse<T>(retryResponse);
+          }
         }
-      }
 
-      return this.handleResponse<T>(response);
-    } catch (error) {
-      console.error('API request failed:', error);
-      throw new Error('Network error occurred');
+        return this.handleResponse<T>(response);
+      } catch (error) {
+        lastError = error as Error;
+        console.error(`API request failed (attempt ${attempt}/${maxRetries}):`, error);
+        console.error('Request URL:', url);
+        console.error('Request config:', config);
+        
+        if (attempt === maxRetries) {
+          if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
+            throw new Error(`Network error: Unable to connect to ${this.baseURL} after ${maxRetries} attempts. This might be a CORS issue or network connectivity problem. Please try again later.`);
+          }
+          throw new Error(`Network error occurred after ${maxRetries} attempts: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+        
+        // Wait before retrying (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+      }
     }
+
+    throw lastError || new Error('Unknown error occurred');
   }
 
   // Handle API response
@@ -250,8 +273,30 @@ class ApiService {
   }
 
   // API methods
-  async getProfile(): Promise<ApiResponse<{ walletAddress: string; connectedAt: string }>> {
-    return await this.request<{ walletAddress: string; connectedAt: string }>('/profile');
+  async getProfile(): Promise<ApiResponse<{ 
+    walletAddress: string; 
+    username?: string;
+    isActive: boolean;
+    lastLoginAt: string;
+    createdAt: string;
+    primaryWallet?: {
+      publicKey: string;
+      network: string;
+      isActive: boolean;
+    };
+  }>> {
+    return await this.request<{ 
+      walletAddress: string; 
+      username?: string;
+      isActive: boolean;
+      lastLoginAt: string;
+      createdAt: string;
+      primaryWallet?: {
+        publicKey: string;
+        network: string;
+        isActive: boolean;
+      };
+    }>('/auth/profile');
   }
 
   async getGeneratedWallet(): Promise<ApiResponse<WalletData>> {

@@ -81,6 +81,53 @@ class UserService {
       throw error;
     }
   }
+
+  async setUsername(walletAddress: string, username: string): Promise<IUser | null> {
+    try {
+      // Check if username is already taken
+      const existingUser = await User.findOne({ username });
+      if (existingUser && existingUser.walletAddress !== walletAddress) {
+        throw new Error('Username is already taken');
+      }
+
+      // Update user with new username
+      const user = await User.findOneAndUpdate(
+        { walletAddress },
+        { username },
+        { new: true }
+      );
+
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      console.log(`✅ Username set for ${walletAddress}: ${username}`);
+      return user;
+    } catch (error) {
+      console.error('Error setting username:', error);
+      throw error;
+    }
+  }
+
+  async getUsername(walletAddress: string): Promise<string | null> {
+    try {
+      const user = await User.findOne({ walletAddress });
+      return user?.username || null;
+    } catch (error) {
+      console.error('Error getting username:', error);
+      throw error;
+    }
+  }
+
+  async checkUsernameAvailability(username: string): Promise<boolean> {
+    try {
+      const existingUser = await User.findOne({ username });
+      return !existingUser; // Return true if username is available
+    } catch (error) {
+      console.error('Error checking username availability:', error);
+      throw error;
+    }
+  }
 }
 
 export default new UserService(); 
