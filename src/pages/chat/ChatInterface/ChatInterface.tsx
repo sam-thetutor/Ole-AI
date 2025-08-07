@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react'
 import { useStellarWallet } from '../../../contexts/StellarWalletContext/StellarWalletContext'
 import apiService from '../../../services/api'
 import MarkdownRenderer from '../../../components/common/MarkdownRenderer/MarkdownRenderer'
+import ActionForm from '../../../components/common/ActionForm'
+import type { ActionData } from '../../../components/common/ActionForm'
 import './ChatInterface.css'
 
 interface Message {
@@ -10,6 +12,7 @@ interface Message {
   sender: 'user' | 'ai'
   timestamp: Date
   data?: any
+  action?: ActionData
 }
 
 const ChatInterface: React.FC = () => {
@@ -71,6 +74,8 @@ const ChatInterface: React.FC = () => {
 
     try {
       // Send message to backend AI service
+      // The AI agent should return a structured response with action data
+      // when it detects the user wants to perform an action like sending tokens
       const response = await apiService.sendChatMessage(inputValue.trim())
       
       if (response.success && response.data) {
@@ -79,7 +84,8 @@ const ChatInterface: React.FC = () => {
           text: response.data.response,
           sender: 'ai',
           timestamp: new Date(response.data.timestamp),
-          data: response.data
+          data: response.data,
+          action: response.data.action
         }
         setMessages(prev => [...prev, aiResponse])
       } else {
@@ -119,6 +125,30 @@ const ChatInterface: React.FC = () => {
     }
   }
 
+  const handleActionComplete = (result: any) => {
+    // Add a success/error message to the chat
+    const actionMessage: Message = {
+      id: Date.now().toString(),
+      text: result.success 
+        ? `✅ ${result.message}${result.transactionHash ? `\n\nTransaction Hash: \`${result.transactionHash}\`` : ''}`
+        : `❌ ${result.message}`,
+      sender: 'ai',
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, actionMessage])
+  }
+
+  const handleActionCancel = () => {
+    // Add a cancellation message to the chat
+    const cancelMessage: Message = {
+      id: Date.now().toString(),
+      text: '❌ Transaction cancelled by user.',
+      sender: 'ai',
+      timestamp: new Date()
+    }
+    setMessages(prev => [...prev, cancelMessage])
+  }
+
   if (!isConnected) {
     return (
       <div className="chat-container">
@@ -130,8 +160,55 @@ const ChatInterface: React.FC = () => {
     )
   }
 
+  if (!isAuthenticated) {
+    return (
+      <div className="chat-container">
+        <div className="wallet-prompt">
+          <h2>Authentication Required</h2>
+          <p>Please wait while we authenticate your wallet...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="chat-container">
+      {/* Test Button for Development */}
+      {/* <div className="chat-test-controls">
+        <button 
+          onClick={simulateTokenSendRequest}
+          className="test-button"
+          title="Simulate token send request"
+        >
+          🧪 Test Token Send
+        </button>
+        <button 
+          onClick={() => {
+            const userMessage: Message = {
+              id: Date.now().toString(),
+              text: "Hello, how can you help me?",
+              sender: 'user',
+              timestamp: new Date()
+            };
+            setMessages(prev => [...prev, userMessage]);
+            
+            setTimeout(() => {
+              const aiResponse: Message = {
+                id: (Date.now() + 1).toString(),
+                text: "Hello! I'm your AI assistant. I can help you with:\n\n• **Send tokens** - Transfer XLM, USDC, or other assets\n• **Check balance** - View your wallet balance\n• **View transactions** - See your transaction history\n• **Create payment links** - Generate shareable payment links\n\nJust ask me what you'd like to do!",
+                sender: 'ai',
+                timestamp: new Date()
+              };
+              setMessages(prev => [...prev, aiResponse]);
+            }, 500);
+          }}
+          className="test-button"
+          title="Simulate regular chat"
+        >
+          🧪 Test Chat
+        </button>
+      </div> */}
+      
       <div className="chat-messages">
         {messages.map((message) => (
           <div 
@@ -140,7 +217,16 @@ const ChatInterface: React.FC = () => {
           >
             <div className="message-content">
               <MarkdownRenderer content={message.text} />
-              {message.data && (
+              {message.action && (
+                <div className="message-action">
+                  <ActionForm
+                    action={message.action}
+                    onComplete={handleActionComplete}
+                    onCancel={handleActionCancel}
+                  />
+                </div>
+              )}
+              {message.data && !message.action && (
                 <div className="message-data">
                   {message.data.transactionHash && (
                     <div className="transaction-info">

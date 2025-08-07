@@ -118,6 +118,13 @@ const Navbar: React.FC = () => {
       {/* Desktop Navigation */}
       <div className="navbar-right desktop-nav">
         <Link
+          to="/whitepaper"
+          className={`nav-link ${isActive("/whitepaper") ? "active" : ""}`}
+        >
+          Whitepaper
+        </Link>
+        
+        <Link
           to="/leaderboard"
           className={`nav-link ${isActive("/leaderboard") ? "active" : ""}`}
         >
@@ -188,6 +195,16 @@ const Navbar: React.FC = () => {
       <div
         className={`mobile-nav ${isMobileMenuOpen ? "mobile-nav-open" : ""}`}
       >
+        <Link
+          to="/whitepaper"
+          className={`mobile-nav-link ${
+            isActive("/whitepaper") ? "active" : ""
+          }`}
+          onClick={() => setIsMobileMenuOpen(false)}
+        >
+          Whitepaper
+        </Link>
+        
         <Link
           to="/leaderboard"
           className={`mobile-nav-link ${

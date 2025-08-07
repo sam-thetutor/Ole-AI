@@ -16,7 +16,7 @@ const ConnectWalletButton: React.FC = () => {
       onClick={connect}
       disabled={connecting}
     >
-      {connecting ? 'Connecting...' : 'Connect Wallet'}
+      {connecting ? 'Connecting...' : 'Connect'}
     </button>
   );
 };

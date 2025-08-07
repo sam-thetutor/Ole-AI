@@ -1,0 +1,16 @@
+/* Import form steps styles */
+@import '../../common/FormSteps/FormSteps.css';
+
+/* TokenSendForm - Alien Tech Theme */
+.token-send-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 0;
+  min-height: auto;
+}
+
+.token-send-form {
+  max-width: 100%;
+  width: 100%;
+} 

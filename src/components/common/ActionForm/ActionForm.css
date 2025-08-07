@@ -1,0 +1,51 @@
+/* ActionForm - Alien Tech Theme */
+.action-form {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Compact version for chat context */
+.action-form.chat-context {
+  max-width: 100%;
+  margin: 0;
+}
+
+.action-form-error {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  border-radius: 12px;
+  color: #ffffff;
+}
+
+.action-form-error h3 {
+  color: #ff4757;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.action-form-error p {
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.btn-secondary {
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  color: #00ff88;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.btn-secondary:hover {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: rgba(0, 255, 136, 0.5);
+  box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+} 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, BarChart3, RefreshCw, TrendingUp, Rocket, Zap, Shield, Globe, Users, Target } from 'lucide-react';
+import { MessageSquare, BarChart3, RefreshCw, TrendingUp, Zap, Shield, Globe, Target } from 'lucide-react';
 import logoImage from '../../../assets/logo.png';
 import MetricsDisplay from '../../../components/common/MetricsDisplay/MetricsDisplay';
 import './Homepage.css';
@@ -14,12 +14,10 @@ const Homepage: React.FC = () => {
           <h1 className="hero-title">
             <span className="gradient-text">OLE</span>
             <br />
-            <span className="gradient-text">AI Agent</span>
+            {/* <span className="gradient-text">Ole</span> */}
           </h1>
           <p className="hero-subtitle">
-            Prompt your way into the Stellar Universe. The only AI-powered portal 
-            to seamlessly navigate, trade, and manage your digital assets with 
-            natural language commands.
+            One platform, all opportunities, zero friction. Unify the entire Stellar ecosystem under a single, intelligent interface.
           </p>
           
           {/* {!isConnected ? (
@@ -45,11 +43,14 @@ const Homepage: React.FC = () => {
           )} */}
           <div className="cta-section">
             <button 
-              className="connect-wallet-btn primary-btn"
+              className="connect-wallet-btn"
             >
               <span className="btn-glow"></span>
               Discover More
             </button>
+            <p className="cta-subtitle">
+              Experience the future of DeFi interaction
+            </p>
           </div>
         </div>
         
@@ -66,35 +67,69 @@ const Homepage: React.FC = () => {
       <MetricsDisplay />
 
       <div className="features-section">
-        <h2 className="section-title">What You Can Do</h2>
+        <h2 className="section-title">Key Value Propositions</h2>
         <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">
+              <Globe size={48} />
+            </div>
+            <h3>Unified Interface</h3>
+            <p>One wallet connection grants access to the entire Stellar ecosystem</p>
+          </div>
           <div className="feature-card">
             <div className="feature-icon">
               <MessageSquare size={48} />
             </div>
-            <h3>AI Chat Interface</h3>
-            <p>Interact with your wallet using natural language commands</p>
+            <h3>AI-Powered Interaction</h3>
+            <p>Natural language commands for complex DeFi operations</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">
-              <BarChart3 size={48} />
+              <Zap size={48} />
             </div>
-            <h3>Dashboard Analytics</h3>
-            <p>Track your transactions, balances, and investment performance</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">
-              <RefreshCw size={48} />
-            </div>
-            <h3>Token Swaps</h3>
-            <p>Seamlessly swap between different Stellar tokens</p>
+            <h3>Seamless Integration</h3>
+            <p>No need to leave the platform for any DeFi activity</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">
               <TrendingUp size={48} />
             </div>
-            <h3>DCA Management</h3>
-            <p>Set up and manage Dollar Cost Averaging positions</p>
+            <h3>Maximized Opportunities</h3>
+            <p>Access to all ecosystem opportunities in one place</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="features-section">
+        <h2 className="section-title">Core Features</h2>
+        <div className="features-grid">
+          <div className="feature-card">
+            <div className="feature-icon">
+              <RefreshCw size={48} />
+            </div>
+            <h3>Token Operations</h3>
+            <p>Send, swap, stake, and provide liquidity across all protocols</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">
+              <BarChart3 size={48} />
+            </div>
+            <h3>Advanced Financial Tools</h3>
+            <p>DCA, trading strategies, portfolio management, and risk controls</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">
+              <Shield size={48} />
+            </div>
+            <h3>Payment Solutions</h3>
+            <p>Recurring payments, payment links, and professional invoicing</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">
+              <Target size={48} />
+            </div>
+            <h3>Investment Intelligence</h3>
+            <p>AI-powered market analysis and opportunity discovery</p>
           </div>
         </div>
       </div>
@@ -105,9 +140,6 @@ const Homepage: React.FC = () => {
           <div className="roadmap-phase" style={{'--phase-index': '0'} as React.CSSProperties}>
             <div className="hover-effect"></div>
             <div className="phase-header">
-              <div className="phase-icon">
-                <Rocket size={32} />
-              </div>
               <h3>Phase 1: Foundation</h3>
               <span className="phase-status completed">Completed</span>
             </div>
@@ -126,19 +158,16 @@ const Homepage: React.FC = () => {
           <div className="roadmap-phase" style={{'--phase-index': '1'} as React.CSSProperties}>
             <div className="hover-effect"></div>
             <div className="phase-header">
-              <div className="phase-icon">
-                <Zap size={32} />
-              </div>
-              <h3>Phase 2: Enhanced Features</h3>
+              <h3>Phase 2: Core Features</h3>
               <span className="phase-status in-progress">In Progress</span>
             </div>
             <div className="phase-content">
               <ul>
-                <li>🔄 Soroswap and Defindex Integration</li>
-                <li>🔄 Deploy Smart contracts feature</li>
-                <li>🔄 Create tokens</li>
-                <li>🔄 Create NFTs</li>
-                <li>🔄 Create Payment Links</li>
+                <li>🔄 Soroswap Inegration</li>
+                <li>🔄 Defindex integration</li>
+                <li>🔄 Payment links systems</li>
+                <li>🔄 Advanced AI features</li>
+                <li>🔄 Protocol integrations</li>
               </ul>
             </div>
           </div>
@@ -146,20 +175,16 @@ const Homepage: React.FC = () => {
           <div className="roadmap-phase" style={{'--phase-index': '2'} as React.CSSProperties}>
             <div className="hover-effect"></div>
             <div className="phase-header">
-              <div className="phase-icon">
-                <Shield size={32} />
-              </div>
-              <h3>Phase 3: Security & Compliance</h3>
+              <h3>Phase 3: Advanced Features</h3>
               <span className="phase-status planned">Planned</span>
             </div>
             <div className="phase-content">
               <ul>
-                <li>🔒 Wallet Signature Verification</li>
-                <li>🔒 Multi-factor Authentication</li>
-                <li>🔒 Advanced Security Features</li>
-                <li>🔒 Compliance & Audit Tools</li>
-                <li>🔒 Insurance Integration</li>
-                <li>🔒 Privacy Enhancements</li>
+                <li>⏳ DCA and trading strategies</li>
+                <li>⏳ Portfolio management</li>
+                <li>⏳ Institutional features</li>
+                <li>⏳ Mobile application</li>
+                <li>⏳ Advanced analytics</li>
               </ul>
             </div>
           </div>
@@ -167,65 +192,21 @@ const Homepage: React.FC = () => {
           <div className="roadmap-phase" style={{'--phase-index': '3'} as React.CSSProperties}>
             <div className="hover-effect"></div>
             <div className="phase-header">
-              <div className="phase-icon">
-                <Globe size={32} />
-              </div>
               <h3>Phase 4: Ecosystem Expansion</h3>
               <span className="phase-status planned">Planned</span>
             </div>
             <div className="phase-content">
               <ul>
-                <li>🌐 Cross-chain Integration</li>
-                <li>🌐 DeFi Protocol Support</li>
-                <li>🌐 NFT Management</li>
-                <li>🌐 Social Trading Features</li>
-                <li>🌐 API for Developers</li>
-                <li>🌐 Mobile App Development</li>
+                <li>⏳ Cross-chain integration</li>
+                <li>⏳ Advanced analytics</li>
+                <li>⏳ Enterprise solutions</li>
+                <li>⏳ Global expansion</li>
+                <li>⏳ API for developers</li>
               </ul>
             </div>
           </div>
 
-          <div className="roadmap-phase" style={{'--phase-index': '4'} as React.CSSProperties}>
-            <div className="hover-effect"></div>
-            <div className="phase-header">
-              <div className="phase-icon">
-                <Users size={32} />
-              </div>
-              <h3>Phase 5: Community & Governance</h3>
-              <span className="phase-status planned">Planned</span>
-            </div>
-            <div className="phase-content">
-              <ul>
-                <li>👥 Community Features</li>
-                <li>👥 Governance Token</li>
-                <li>👥 DAO Integration</li>
-                <li>👥 Social Features</li>
-                <li>👥 Educational Content</li>
-                <li>👥 Partnership Program</li>
-              </ul>
-            </div>
-          </div>
 
-          <div className="roadmap-phase" style={{'--phase-index': '5'} as React.CSSProperties}>
-            <div className="hover-effect"></div>
-            <div className="phase-header">
-              <div className="phase-icon">
-                <Target size={32} />
-              </div>
-              <h3>Phase 6: Advanced AI & Automation</h3>
-              <span className="phase-status planned">Planned</span>
-            </div>
-            <div className="phase-content">
-              <ul>
-                <li>🤖 Advanced AI Trading</li>
-                <li>🤖 Automated Portfolio Management</li>
-                <li>🤖 Predictive Analytics</li>
-                <li>🤖 Smart Contract Integration</li>
-                <li>🤖 AI-powered Risk Management</li>
-                <li>🤖 Personalized AI Assistant</li>
-              </ul>
-            </div>
-          </div>
         </div>
       </div>
     </div>
