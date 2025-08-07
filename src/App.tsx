@@ -8,6 +8,8 @@ import Dashboard from './pages/dashboard/Dashboard/Dashboard'
 import Leaderboard from './pages/leaderboard/Leaderboard/Leaderboard'
 import ChatInterface from './pages/chat/ChatInterface/ChatInterface'
 import PaymentPage from './pages/payment/PaymentPage/PaymentPage'
+import TestTokenSend from './pages/TestTokenSend'
+import Whitepaper from './pages/whitepaper/Whitepaper'
 // import PaymentPageTest from '../tests/frontend/PaymentPageTest'
 import ProtectedRoute from './components/layout/ProtectedRoute/ProtectedRoute'
 import ChatModal from './components/common/ChatModal/ChatModal'
@@ -46,6 +48,8 @@ function App() {
                   } 
                 />
                 <Route path="/pay/:linkId" element={<PaymentPage />} />
+                <Route path="/test-token-send" element={<TestTokenSend />} />
+                <Route path="/whitepaper" element={<Whitepaper />} />
                 {/* <Route path="/test-payment" element={<PaymentPageTest />} /> */}
               </Routes>
             </main>

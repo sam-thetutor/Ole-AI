@@ -271,9 +271,9 @@
 
 .features-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
 }
 
@@ -342,7 +342,19 @@
   margin: 0;
 }
 
-/* Mobile Responsive */
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 1000px;
+  }
+  
+  .roadmap-container {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 1000px;
+  }
+}
+
 @media (max-width: 768px) {
   .hero-section {
     flex-direction: column;
@@ -368,6 +380,12 @@
   }
   
   .features-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+  
+  .roadmap-container {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     padding: 0 1rem;
@@ -522,10 +540,10 @@
 }
 
 .roadmap-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 2rem;
   position: relative;
   z-index: 3;
@@ -609,8 +627,9 @@
 
 .phase-header {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
   position: relative;
 }
@@ -656,7 +675,6 @@
   font-size: 1.2rem;
   font-weight: 600;
   margin: 0;
-  flex-grow: 1;
   position: relative;
   text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
 }
@@ -812,15 +830,10 @@
   100% { transform: translateY(-200px); }
 }
 
-/* Mobile Responsive for Roadmap */
+/* Additional roadmap responsive styles */
 @media (max-width: 768px) {
   .roadmap-section {
     padding: 2rem 1rem;
-  }
-  
-  .roadmap-container {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
   }
   
   .roadmap-phase {
@@ -828,9 +841,8 @@
   }
   
   .phase-header {
-    flex-direction: column;
     text-align: center;
-    gap: 0.5rem;
+    align-items: center;
   }
   
   .phase-header h3 {

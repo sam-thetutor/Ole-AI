@@ -75,6 +75,15 @@ interface ChatResponse {
   response: string;
   timestamp: string;
   userId: string;
+  action?: {
+    type: string;
+    component: string;
+    formData?: {
+      steps?: any[];
+      validation?: any;
+      prefill?: any;
+    };
+  };
 }
 
 interface ChatTool {
@@ -357,6 +366,14 @@ class ApiService {
     return await this.request<ChatResponse>('/chat/send', {
       method: 'POST',
       body: JSON.stringify({ message }),
+    });
+  }
+
+  // Action execution methods
+  async executeAction(actionType: string, formData: any): Promise<ApiResponse<any>> {
+    return await this.request(`/actions/${actionType}`, {
+      method: 'POST',
+      body: JSON.stringify(formData),
     });
   }
 

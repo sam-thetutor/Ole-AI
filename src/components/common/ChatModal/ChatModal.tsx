@@ -13,7 +13,7 @@ const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="🤖 Stellar AI Assistant"
+      title="🤖 Stellar AI Agent"
       size="full"
       showCloseButton={true}
     >
